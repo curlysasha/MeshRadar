@@ -67,9 +67,23 @@ export const useMeshStore = create<MeshState>((set, get) => ({
 
   messages: [],
   addMessage: (message) =>
-    set((state) => ({
-      messages: [...state.messages, message],
-    })),
+    set((state) => {
+      const existingIdx = message.packet_id
+        ? state.messages.findIndex((m) => m.packet_id === message.packet_id)
+        : -1
+
+      if (existingIdx >= 0) {
+        const messages = [...state.messages]
+        messages[existingIdx] = { ...messages[existingIdx], ...message }
+        return { messages }
+      }
+
+      if (state.messages.some((m) => m.id === message.id)) {
+        return state
+      }
+
+      return { messages: [...state.messages, message] }
+    }),
   setMessages: (messages) => set({ messages }),
   updateMessageAck: (packetId, ackStatus) =>
     set((state) => ({

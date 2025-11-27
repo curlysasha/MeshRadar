@@ -1,16 +1,112 @@
 import { X, MapPin, Battery, Signal, Cpu, Route, Loader2, AlertCircle } from 'lucide-react'
+import * as Dialog from '@radix-ui/react-dialog'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useMeshStore } from '@/store'
 import { useTraceroute } from '@/hooks/useApi'
-import { getNodeName } from '@/lib/utils'
+import { cn, getNodeName } from '@/lib/utils'
 import { useEffect, useRef, useState } from 'react'
+import { Map as MapLibreMap, NavigationControl, Marker } from 'maplibre-gl'
+import 'maplibre-gl/dist/maplibre-gl.css'
+
+const OSM_RASTER_STYLE = {
+  version: 8,
+  name: 'OSM',
+  sources: {
+    osm: {
+      type: 'raster',
+      tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+      tileSize: 256,
+      attribution:
+        '© OpenStreetMap contributors'
+    }
+  },
+  layers: [
+    {
+      id: 'osm',
+      type: 'raster',
+      source: 'osm'
+    }
+  ]
+} as const
+
+function formatCoord(value: number | undefined, digits = 5) {
+  if (typeof value !== 'number' || Number.isNaN(value)) return 'Unknown'
+  return value.toFixed(digits)
+}
+
+function MapView({
+  latitude,
+  longitude,
+  zoom = 12,
+  interactive = false,
+  showAttribution = true,
+  className,
+}: {
+  latitude: number
+  longitude: number
+  zoom?: number
+  interactive?: boolean
+  showAttribution?: boolean
+  className?: string
+}) {
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const mapRef = useRef<MapLibreMap | null>(null)
+  const markerRef = useRef<Marker | null>(null)
+
+  // Create map once
+  useEffect(() => {
+    if (!containerRef.current || mapRef.current) return
+
+    mapRef.current = new MapLibreMap({
+      container: containerRef.current,
+      style: OSM_RASTER_STYLE as any,
+      center: [longitude, latitude],
+      zoom,
+      interactive,
+      attributionControl: showAttribution,
+      maxZoom: 18,
+    })
+    if (interactive) {
+      mapRef.current.addControl(new NavigationControl({ showCompass: false }), 'top-right')
+    }
+
+    const markerEl = document.createElement('div')
+    markerEl.className = 'w-3 h-3 rounded-full bg-primary ring-2 ring-white shadow-[0_0_0_4px_rgba(0,0,0,0.15)]'
+    markerRef.current = new Marker({ element: markerEl, anchor: 'center' })
+      .setLngLat([longitude, latitude])
+      .addTo(mapRef.current)
+
+    return () => {
+      markerRef.current?.remove()
+      markerRef.current = null
+      mapRef.current?.remove()
+      mapRef.current = null
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Sync view when coords/zoom change
+  useEffect(() => {
+    if (!mapRef.current) return
+    mapRef.current.setCenter([longitude, latitude])
+    mapRef.current.setZoom(zoom)
+    mapRef.current.resize()
+    markerRef.current?.setLngLat([longitude, latitude])
+  }, [latitude, longitude, zoom])
+
+  return (
+    <div ref={containerRef} className={cn('relative rounded-lg overflow-hidden', className)}>
+    </div>
+  )
+}
 
 export function NodeInfoPanel() {
   const { selectedNode, setSelectedNode, tracerouteResult, setTracerouteResult, nodes, status } = useMeshStore()
   const traceroute = useTraceroute()
   const [tracerouteTimeout, setTracerouteTimeout] = useState(false)
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [isMapOpen, setIsMapOpen] = useState(false)
 
   if (!selectedNode) return null
 
@@ -141,7 +237,7 @@ export function NodeInfoPanel() {
               </div>
             )}
 
-            {selectedNode.deviceMetrics.voltage !== undefined && (
+            {typeof selectedNode.deviceMetrics.voltage === 'number' && !Number.isNaN(selectedNode.deviceMetrics.voltage) && (
               <div className="flex items-center justify-between text-sm">
                 <span className="flex items-center gap-2 text-muted-foreground">
                   <Cpu className="w-4 h-4" />
@@ -151,14 +247,14 @@ export function NodeInfoPanel() {
               </div>
             )}
 
-            {selectedNode.deviceMetrics.channelUtilization !== undefined && (
+            {typeof selectedNode.deviceMetrics.channelUtilization === 'number' && !Number.isNaN(selectedNode.deviceMetrics.channelUtilization) && (
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Channel Util</span>
                 <span>{selectedNode.deviceMetrics.channelUtilization.toFixed(1)}%</span>
               </div>
             )}
 
-            {selectedNode.deviceMetrics.airUtilTx !== undefined && (
+            {typeof selectedNode.deviceMetrics.airUtilTx === 'number' && !Number.isNaN(selectedNode.deviceMetrics.airUtilTx) && (
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Air Util TX</span>
                 <span>{selectedNode.deviceMetrics.airUtilTx.toFixed(1)}%</span>
@@ -181,11 +277,57 @@ export function NodeInfoPanel() {
                 <div>Alt: {selectedNode.position.altitude}m</div>
               )}
             </div>
+            <Dialog.Root open={isMapOpen} onOpenChange={setIsMapOpen}>
+              <Dialog.Trigger asChild>
+                <button
+                  type="button"
+                  className="mt-3 w-full cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-primary rounded-lg"
+                >
+                  <MapView
+                    latitude={selectedNode.position.latitude}
+                    longitude={selectedNode.position.longitude}
+                    zoom={13}
+                    showAttribution={false}
+                    className="h-40 w-full"
+                  />
+                </button>
+              </Dialog.Trigger>
+              <Dialog.Portal>
+                <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
+                <Dialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-3xl -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-card p-4 shadow-xl border border-border focus:outline-none">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <Dialog.Title className="text-base font-semibold">
+                        {getNodeName(selectedNode)}
+                      </Dialog.Title>
+                      <Dialog.Description className="text-xs text-muted-foreground mt-0.5">
+                        Координаты: {formatCoord(selectedNode.position.latitude)}, {formatCoord(selectedNode.position.longitude)}
+                      </Dialog.Description>
+                    </div>
+                    <Dialog.Close asChild>
+                      <Button variant="ghost" size="icon">
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </Dialog.Close>
+                  </div>
+                  <MapView
+                    latitude={selectedNode.position.latitude}
+                    longitude={selectedNode.position.longitude}
+                    zoom={15}
+                    interactive
+                    className="h-[420px] w-full"
+                  />
+                  <div className="mt-3 text-xs text-muted-foreground">
+                    Источник карты: OpenStreetMap (raster tiles, без API-ключей)
+                  </div>
+                </Dialog.Content>
+              </Dialog.Portal>
+            </Dialog.Root>
           </div>
         )}
 
         {/* SNR */}
-        {selectedNode.snr !== undefined && (
+        {typeof selectedNode.snr === 'number' && !Number.isNaN(selectedNode.snr) && (
           <div className="mb-4">
             <div className="flex items-center gap-2 text-sm">
               <Signal className="w-4 h-4 text-muted-foreground" />
@@ -252,7 +394,9 @@ export function NodeInfoPanel() {
                         </span>
                         {hop.isSource && <span className="text-xs text-muted-foreground">(you)</span>}
                         {hop.isDest && <span className="text-xs text-muted-foreground">(target)</span>}
-                        {!hop.isSource && !hop.isDest && tracerouteResult.snr_towards[i - 1] !== undefined && (
+                        {!hop.isSource && !hop.isDest &&
+                          typeof tracerouteResult.snr_towards[i - 1] === 'number' &&
+                          !Number.isNaN(tracerouteResult.snr_towards[i - 1]) && (
                           <span className="text-xs text-muted-foreground ml-auto">
                             SNR: {tracerouteResult.snr_towards[i - 1].toFixed(1)} dB
                           </span>
@@ -278,7 +422,9 @@ export function NodeInfoPanel() {
                         </span>
                         {hop.isSource && <span className="text-xs text-muted-foreground">(you)</span>}
                         {hop.isDest && <span className="text-xs text-muted-foreground">(target)</span>}
-                        {!hop.isSource && !hop.isDest && tracerouteResult.snr_back[tracerouteResult.route_back.length - i] !== undefined && (
+                        {!hop.isSource && !hop.isDest &&
+                          typeof tracerouteResult.snr_back[tracerouteResult.route_back.length - i] === 'number' &&
+                          !Number.isNaN(tracerouteResult.snr_back[tracerouteResult.route_back.length - i]) && (
                           <span className="text-xs text-muted-foreground ml-auto">
                             SNR: {tracerouteResult.snr_back[tracerouteResult.route_back.length - i].toFixed(1)} dB
                           </span>
