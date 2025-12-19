@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { Send, Hash, User, X, Reply } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -13,6 +14,7 @@ import { isSameDay } from 'date-fns'
 import type { Message } from '@/types'
 
 export function ChatArea() {
+  const { t } = useTranslation()
   const [text, setText] = useState('')
   const [replyingTo, setReplyingTo] = useState<Message | null>(null)
   const scrollViewportRef = useRef<HTMLDivElement>(null)
@@ -189,8 +191,8 @@ export function ChatArea() {
         <ChatTabs />
         <div className="flex-1 flex items-center justify-center text-muted-foreground">
           <div className="text-center">
-            <p className="text-lg mb-2">Not connected</p>
-            <p className="text-sm">Connect to a Meshtastic node to start chatting</p>
+            <p className="text-lg mb-2">{t('common.notConnected')}</p>
+            <p className="text-sm">{t('chat.connectToStart')}</p>
           </div>
         </div>
       </div>
@@ -203,8 +205,8 @@ export function ChatArea() {
         <ChatTabs />
         <div className="flex-1 flex items-center justify-center text-muted-foreground">
           <div className="text-center">
-            <p className="text-lg mb-2">Select a channel or node</p>
-            <p className="text-sm">Choose from the sidebar to start messaging</p>
+            <p className="text-lg mb-2">{t('chat.selectChat')}</p>
+            <p className="text-sm">{t('chat.chooseSidebar')}</p>
           </div>
         </div>
       </div>
@@ -220,7 +222,7 @@ export function ChatArea() {
       <div
         className="h-14 px-4 border-b border-border flex items-center gap-3 bg-card/50 hover:bg-card/80 cursor-pointer transition-colors group"
         onClick={() => setIsNetworkMapOpen(true)}
-        title="Open Network Map"
+        title={t('chat.openMap')}
       >
         {currentChat.type === 'channel' ? (
           <Hash className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
@@ -230,8 +232,8 @@ export function ChatArea() {
         <div className="flex-1">
           <h2 className="font-semibold group-hover:text-primary transition-colors">{currentChat.name}</h2>
           <p className="text-xs text-muted-foreground flex items-center gap-1">
-            {currentChat.type === 'channel' ? 'Channel' : 'Direct Message'}
-            <span className="opacity-0 group-hover:opacity-100 transition-opacity ml-1 text-[10px] bg-primary/10 text-primary px-1 rounded">Open Map</span>
+            {currentChat.type === 'channel' ? t('chat.channel') : t('chat.directMessage')}
+            <span className="opacity-0 group-hover:opacity-100 transition-opacity ml-1 text-[10px] bg-primary/10 text-primary px-1 rounded">{t('chat.openMapLabel')}</span>
           </p>
         </div>
       </div>
@@ -241,7 +243,7 @@ export function ChatArea() {
         <div className="flex flex-col gap-1 min-h-full">
           {processedMessages.length === 0 ? (
             <div className="text-center text-muted-foreground py-8">
-              No messages yet. Start the conversation!
+              {t('chat.noMessages')}
             </div>
           ) : (
             processedMessages.map((message) => (
@@ -267,7 +269,7 @@ export function ChatArea() {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 text-xs font-semibold text-primary mb-1">
               <Reply className="w-3 h-3" />
-              Replying to {getSenderName(replyingTo)}
+              {t('chat.replyingTo', { name: getSenderName(replyingTo) })}
             </div>
             <p className="text-xs text-muted-foreground truncate italic">
               "{replyingTo.text}"
@@ -294,7 +296,7 @@ export function ChatArea() {
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={`Message ${currentChat.name}...`}
+            placeholder={t('chat.messagePlaceholder', { name: currentChat.name })}
             className="flex-1 shadow-sm"
           />
           <Button

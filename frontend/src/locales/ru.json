@@ -1,0 +1,125 @@
+{
+    "common": {
+        "unknown": "Неизвестно",
+        "waiting": "Ожидание...",
+        "none": "—",
+        "me": "Я",
+        "meLocal": "Я (Локальный узел)",
+        "notConnected": "Не подключено",
+        "noConnection": "Нет соединения",
+        "openChat": "Открыть чат",
+        "waitTraceroute": "Ожидание ответа трассировки...",
+        "timeoutTraceroute": "Ответ не получен (таймаут 60с)",
+        "offlineWarning": "Узел может быть не в сети или недоступен",
+        "mapOSM": "Источник карты: OpenStreetMap (raster tiles, без API-ключей)"
+    },
+    "sidebar": {
+        "search": "Поиск...",
+        "searchTitle": "Поиск",
+        "sortTitle": "Сортировка",
+        "sortByName": "По имени",
+        "sortByActivity": "По активности",
+        "unread": "Непрочитанные",
+        "channels": "Каналы",
+        "nodes": "Узлы",
+        "meshtastic": "Meshtastic"
+    },
+    "connection": {
+        "connected": "Подключено",
+        "disconnected": "Отключено",
+        "details": "Детали подключения",
+        "type": "Тип:",
+        "node": "Узел:",
+        "address": "Адрес:",
+        "connect": "Подключить",
+        "disconnect": "Отключить",
+        "tcp": "TCP",
+        "serial": "Serial"
+    },
+    "chat": {
+        "selectChat": "Выберите канал или узел",
+        "chooseSidebar": "Выберите в боковой панели, чтобы начать общение",
+        "connectToStart": "Подключитесь к узлу Meshtastic, чтобы начать чат",
+        "openMap": "Открыть карту сети",
+        "channel": "Канал",
+        "directMessage": "Личное сообщение",
+        "noMessages": "Сообщений пока нет. Начните беседу!",
+        "replyingTo": "Ответ {{name}}",
+        "messagePlaceholder": "Написать {{name}}...",
+        "openMapLabel": "Открыть карту"
+    },
+    "nodeInfo": {
+        "title": "Инфо об узле",
+        "unknownNode": "Неизвестный узел",
+        "lastHeard": "Последний раз в сети",
+        "deviceMetrics": "Метрики устройства",
+        "battery": "Батарея",
+        "voltage": "Напряжение",
+        "channelUtil": "Загрузка канала",
+        "airUtilTx": "Загрузка эфира TX",
+        "position": "Положение",
+        "lat": "Шир:",
+        "lon": "Дол:",
+        "alt": "Выс:",
+        "traceroute": "Трассировка",
+        "requestTraceroute": "Запросить трассировку",
+        "ago": {
+            "seconds": "{{count}}с назад",
+            "minutes": "{{count}}м назад",
+            "hours": "{{count}}ч назад",
+            "days": "{{count}}д назад"
+        },
+        "duration": {
+            "seconds": "{{count}}с",
+            "minutes": "{{count}}м",
+            "hours": "{{count}}ч",
+            "days": "{{count}}д"
+        },
+        "unknownHop": "Неизвестный хоп {{index}}",
+        "distance": {
+            "km": "{{value}} км",
+            "m": "{{value}} м"
+        }
+    },
+    "networkOverview": {
+        "map": "Карта сети",
+        "fullscreen": "На весь экран",
+        "openGlobalMap": "Открыть карту сети",
+        "activeNodes": "Активные узлы",
+        "avgEnergy": "Средняя энергия",
+        "hardwareDiversity": "Разнообразие оборудования",
+        "connectivityHealth": "Здоровье сети",
+        "coordinateCoverage": "Покрытие координатами",
+        "networkRelevancy": "Актуальность сети",
+        "globalMesh": "Глобальная сеть Mesh",
+        "registered": "зарегистрировано",
+        "withPosition": "с координатами",
+        "meshIntelligence": "Аналитика Mesh",
+        "nodesCount": "{{count}} узлов",
+        "routeOnMap": "Маршрут на карте",
+        "openMap": "Открыть карту"
+    },
+    "traceroute": {
+        "forward": "Вперёд",
+        "back": "Назад",
+        "total": "Всего",
+        "forwardRoute": "Прямой маршрут",
+        "backRoute": "Обратный маршрут",
+        "noCoordsWarning": "Есть узлы без координат — линии обрываются на них.",
+        "noCoordsMap": "Нет координат для отображения маршрута на карте, но список хопов ниже.",
+        "noCoordsSkip": "Некоторые узлы не прислали координаты — маршрут показан с пропусками.",
+        "messageRoute": "Маршрут сообщения",
+        "forwardLabel": "Туда (Forward)",
+        "backLabel": "Обратно (Back)",
+        "routeLabels": {
+            "start": "начало",
+            "goal": "цель",
+            "hop": "хоп",
+            "forward": "прямой маршрут",
+            "back": "обратный маршрут",
+            "unknown": "участок с неизвестными хопами"
+        },
+        "noCoords": "нет координат",
+        "timeout": "Таймаут через {{count}}с"
+    }
+}

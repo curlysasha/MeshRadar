@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Hash, User, Battery, Signal, ArrowUpDown, Search, X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Button } from '@/components/ui/button'
 import {
@@ -19,6 +20,7 @@ export function Sidebar() {
   const { currentChat, setActiveTab, setSelectedNode, selectedNode, getUnreadForChat, setIsNetworkMapOpen } = useMeshStore()
   const { data: nodes } = useNodes()
   const { data: channels } = useChannels()
+  const { t } = useTranslation()
   const [sortBy, setSortBy] = useState<SortType>('name')
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -28,10 +30,10 @@ export function Sidebar() {
     const now = Date.now()
     const diff = Math.floor((now - timestamp * 1000) / 1000)
 
-    if (diff < 60) return `${diff}s`
-    if (diff < 3600) return `${Math.floor(diff / 60)}m`
-    if (diff < 86400) return `${Math.floor(diff / 3600)}h`
-    return `${Math.floor(diff / 86400)}d`
+    if (diff < 60) return t('nodeInfo.duration.seconds', { count: diff })
+    if (diff < 3600) return t('nodeInfo.duration.minutes', { count: Math.floor(diff / 60) })
+    if (diff < 86400) return t('nodeInfo.duration.hours', { count: Math.floor(diff / 3600) })
+    return t('nodeInfo.duration.days', { count: Math.floor(diff / 86400) })
   }
 
   // Filter and Sort nodes
@@ -136,7 +138,7 @@ export function Sidebar() {
               className="text-xs font-semibold text-muted-foreground uppercase px-2 py-1 mb-1 hover:text-foreground cursor-pointer transition-colors"
               onClick={() => setIsNetworkMapOpen(true)}
             >
-              Test Channels
+              {t('sidebar.channels')}
             </div>
             {channels.map((channel) => (
               <button
@@ -158,7 +160,7 @@ export function Sidebar() {
               >
                 <Hash className="w-4 h-4 text-muted-foreground" />
                 <span className="truncate font-medium">
-                  {channel.name || `Channel ${channel.index}`}
+                  {channel.name || t('chat.channel') + ` ${channel.index}`}
                 </span>
               </button>
             ))}
@@ -173,7 +175,7 @@ export function Sidebar() {
                 className="text-xs font-semibold text-muted-foreground uppercase hover:text-foreground cursor-pointer transition-colors"
                 onClick={() => setIsNetworkMapOpen(true)}
               >
-                Nodes ({nodes?.length || 0})
+                {t('sidebar.nodes')} ({nodes?.length || 0})
               </div>
               <div className="flex items-center gap-1">
                 {isSearchOpen ? (
@@ -184,7 +186,7 @@ export function Sidebar() {
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Поиск..."
+                      placeholder={t('sidebar.search')}
                       className="bg-transparent border-none text-xs focus:outline-none w-24 placeholder:text-muted-foreground/50"
                     />
                     <button
@@ -202,7 +204,7 @@ export function Sidebar() {
                     variant="ghost"
                     size="sm"
                     className="h-6 w-6 p-0"
-                    title="Поиск"
+                    title={t('sidebar.searchTitle')}
                     onClick={() => setIsSearchOpen(true)}
                   >
                     <Search className="h-3.5 w-3.5" />
@@ -215,7 +217,7 @@ export function Sidebar() {
                       variant="ghost"
                       size="sm"
                       className="h-6 w-6 p-0"
-                      title="Сортировка"
+                      title={t('sidebar.sortTitle')}
                     >
                       <ArrowUpDown className="h-3.5 w-3.5" />
                     </Button>
@@ -223,12 +225,12 @@ export function Sidebar() {
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => setSortBy('name')}>
                       <span className={cn(sortBy === 'name' && 'font-semibold')}>
-                        По имени
+                        {t('sidebar.sortByName')}
                       </span>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setSortBy('lastHeard')}>
                       <span className={cn(sortBy === 'lastHeard' && 'font-semibold')}>
-                        По активности
+                        {t('sidebar.sortByActivity')}
                       </span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -239,7 +241,7 @@ export function Sidebar() {
             {unreadNodes.length > 0 && (
               <div className="mb-2">
                 <div className="text-[11px] font-semibold text-primary uppercase px-2 py-1">
-                  Unread
+                  {t('sidebar.unread')}
                 </div>
                 {unreadNodes.map((node) => renderNodeButton(node, getUnread(node.id)))}
               </div>
@@ -250,7 +252,7 @@ export function Sidebar() {
         </ScrollArea>
       ) : (
         <div className="flex-1 flex items-center justify-center text-sm text-muted-foreground">
-          No connection
+          {t('common.noConnection')}
         </div>
       )}
     </div>

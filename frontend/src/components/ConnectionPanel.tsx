@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Wifi, Usb, Loader2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useConnect, useDisconnect } from '@/hooks/useApi'
@@ -13,6 +14,7 @@ export function ConnectionPanel() {
   const [address, setAddress] = useState(() => {
     return localStorage.getItem('meshtastic_last_address') || '192.168.1.1'
   })
+  const { t } = useTranslation()
   const status = useMeshStore((s) => s.status)
 
   const connect = useConnect()
@@ -46,7 +48,7 @@ export function ConnectionPanel() {
           )}
         />
         <span className="text-sm font-medium">
-          {status.connected ? 'Connected' : 'Disconnected'}
+          {status.connected ? t('connection.connected') : t('connection.disconnected')}
         </span>
       </div>
 
@@ -60,7 +62,7 @@ export function ConnectionPanel() {
               className="flex-1"
             >
               <Wifi className="w-4 h-4 mr-1" />
-              TCP
+              {t('connection.tcp')}
             </Button>
             <Button
               variant={type === 'serial' ? 'default' : 'outline'}
@@ -69,7 +71,7 @@ export function ConnectionPanel() {
               className="flex-1"
             >
               <Usb className="w-4 h-4 mr-1" />
-              Serial
+              {t('connection.serial')}
             </Button>
           </div>
 
@@ -88,7 +90,7 @@ export function ConnectionPanel() {
             {connect.isPending ? (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
             ) : null}
-            Connect
+            {t('connection.connect')}
           </Button>
 
           {connect.isError && (
@@ -99,20 +101,20 @@ export function ConnectionPanel() {
         <div className="space-y-3">
           <div className="text-[11px] leading-relaxed">
             <div className="flex justify-between items-center text-muted-foreground/80 mb-1 border-b border-border/40 pb-1">
-              <span>Connection Details</span>
+              <span>{t('connection.details')}</span>
             </div>
             <div className="grid grid-cols-2 gap-x-4 gap-y-1">
               <div className="flex items-center gap-1 min-w-0">
-                <span className="text-muted-foreground uppercase text-[9px] tracking-wider whitespace-nowrap">Type:</span>
-                <span className="font-medium uppercase truncate">{status.connection_type || 'Unknown'}</span>
+                <span className="text-muted-foreground uppercase text-[9px] tracking-wider whitespace-nowrap">{t('connection.type')}</span>
+                <span className="font-medium uppercase truncate">{status.connection_type || t('common.unknown')}</span>
               </div>
               <div className="flex items-center gap-1 min-w-0">
-                <span className="text-muted-foreground uppercase text-[9px] tracking-wider whitespace-nowrap">Node:</span>
-                <span className="font-mono text-primary truncate">{status.my_node_id || 'Wait...'}</span>
+                <span className="text-muted-foreground uppercase text-[9px] tracking-wider whitespace-nowrap">{t('connection.node')}</span>
+                <span className="font-mono text-primary truncate">{status.my_node_id || t('common.waiting')}</span>
               </div>
               <div className="flex items-center gap-1 col-span-2 border-t border-border/20 pt-1 mt-0.5 min-w-0">
-                <span className="text-muted-foreground uppercase text-[9px] tracking-wider whitespace-nowrap">Address:</span>
-                <span className="font-medium truncate">{status.address || '—'}</span>
+                <span className="text-muted-foreground uppercase text-[9px] tracking-wider whitespace-nowrap">{t('connection.address')}</span>
+                <span className="font-medium truncate">{status.address || t('common.none')}</span>
               </div>
             </div>
           </div>
@@ -123,7 +125,7 @@ export function ConnectionPanel() {
             className="w-full h-8 text-xs hover:bg-destructive/10 hover:text-destructive transition-colors"
             size="sm"
           >
-            Disconnect
+            {t('connection.disconnect')}
           </Button>
         </div>
       )}

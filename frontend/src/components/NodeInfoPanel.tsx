@@ -1,4 +1,5 @@
 import { X, MapPin, Battery, Signal, Cpu, Route, Loader2, AlertCircle, Map as MapIcon, MessageSquare, Maximize2, Zap, Activity, HardDrive } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import * as Dialog from '@radix-ui/react-dialog'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -18,7 +19,7 @@ const OSM_RASTER_STYLE = {
       tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
       tileSize: 256,
       attribution:
-        '© OpenStreetMap contributors'
+        '© OpenStreetMap'
     }
   },
   layers: [
@@ -440,6 +441,7 @@ export function NodeInfoPanel() {
     tracerouteResult, setTracerouteResult,
     nodes, status, setActiveTab
   } = useMeshStore()
+  const { t } = useTranslation()
   const traceroute = useTraceroute()
   const [tracerouteTimeout, setTracerouteTimeout] = useState(false)
   const [tracerouteCountdown, setTracerouteCountdown] = useState(60)
@@ -537,14 +539,14 @@ export function NodeInfoPanel() {
   const isTracerouteForThisNode = tracerouteResult && selectedNode && tracerouteResult.from === selectedNode.id
 
   const formatLastHeard = (timestamp?: number) => {
-    if (!timestamp) return 'Unknown'
+    if (!timestamp) return t('common.unknown')
     const date = new Date(timestamp * 1000)
     const now = new Date()
     const diff = Math.floor((now.getTime() - date.getTime()) / 1000)
 
-    if (diff < 60) return `${diff}s ago`
-    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`
-    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`
+    if (diff < 60) return t('nodeInfo.ago.seconds', { count: diff })
+    if (diff < 3600) return t('nodeInfo.ago.minutes', { count: Math.floor(diff / 60) })
+    if (diff < 86400) return t('nodeInfo.ago.hours', { count: Math.floor(diff / 3600) })
     return date.toLocaleDateString()
   }
 
@@ -557,8 +559,10 @@ export function NodeInfoPanel() {
   }
 
   const formatKm = (value?: number) => {
-    if (typeof value !== 'number' || !Number.isFinite(value)) return '—'
-    return value >= 1 ? `${value.toFixed(1)} км` : `${(value * 1000).toFixed(0)} м`
+    if (typeof value !== 'number' || !Number.isFinite(value)) return t('common.none')
+    return value >= 1
+      ? t('nodeInfo.distance.km', { value: value.toFixed(1) })
+      : t('nodeInfo.distance.m', { value: (value * 1000).toFixed(0) })
   }
 
   const haversineKm = (a: { lat: number; lon: number }, b: { lat: number; lon: number }) => {
@@ -621,7 +625,7 @@ export function NodeInfoPanel() {
     const myNode = myNodeFromStore || (status.my_node_id ? {
       id: status.my_node_id,
       num: status.my_node_num || 0,
-      user: { longName: 'Me (Local Node)', shortName: 'Me', hwModel: '', id: status.my_node_id },
+      user: { longName: t('common.meLocal'), shortName: t('common.me'), hwModel: '', id: status.my_node_id },
       num_actual: status.my_node_num
     } : null)
 
@@ -690,7 +694,7 @@ export function NodeInfoPanel() {
           const placeholderId = `unknown-${direction}-${hopIndex}`
           points.push({
             id: placeholderId,
-            name: `Unknown hop ${hopIndex}`,
+            name: t('nodeInfo.unknownHop', { index: hopIndex }),
             lat: 0,
             lon: 0,
             role: 'hop',
@@ -766,7 +770,7 @@ export function NodeInfoPanel() {
             </div>
             <div>
               <h3 className="font-semibold text-sm leading-tight">
-                {selectedNode.user?.longName || 'Unknown Node'}
+                {selectedNode.user?.longName || t('nodeInfo.unknownNode')}
               </h3>
               <p className="text-[10px] text-muted-foreground font-mono">
                 {selectedNode.id}
@@ -779,9 +783,9 @@ export function NodeInfoPanel() {
               <MapIcon className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="font-semibold text-sm leading-tight">Network Map</h3>
+              <h3 className="font-semibold text-sm leading-tight">{t('networkOverview.map')}</h3>
               <p className="text-[10px] text-muted-foreground">
-                {nodes.length} nodes in mesh
+                {t('networkOverview.nodesCount', { count: nodes.length })}
               </p>
             </div>
           </>
@@ -803,7 +807,7 @@ export function NodeInfoPanel() {
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-xs text-muted-foreground uppercase flex items-center gap-1">
                 <MapIcon className="w-3 h-3" />
-                Network Map
+                {t('networkOverview.map')}
               </h3>
             </div>
             <div className="relative overflow-hidden rounded-xl border border-border/50 shadow-sm bg-secondary/20 mb-3">
@@ -824,7 +828,7 @@ export function NodeInfoPanel() {
               onClick={() => setIsGlobalMapModalOpen(true)}
             >
               <Maximize2 className="w-4 h-4" />
-              <span>Open Global Map</span>
+              <span>{t('networkOverview.fullscreen')}</span>
             </Button>
           </div>
 
@@ -836,14 +840,14 @@ export function NodeInfoPanel() {
                 <div className="p-3 rounded-xl bg-primary/5 border border-primary/10">
                   <div className="flex items-center gap-2 mb-1">
                     <Activity className="w-3.5 h-3.5 text-primary" />
-                    <span className="text-[10px] text-muted-foreground uppercase font-bold">Active Nodes</span>
+                    <span className="text-[10px] text-muted-foreground uppercase font-bold">{t('networkOverview.activeNodes')}</span>
                   </div>
                   <div className="text-xl font-bold">{meshStats.online} <span className="text-[10px] font-normal text-muted-foreground">/ {meshStats.total}</span></div>
                 </div>
                 <div className="p-3 rounded-xl bg-orange-500/5 border border-orange-500/10">
                   <div className="flex items-center gap-2 mb-1">
                     <Zap className="w-3.5 h-3.5 text-orange-500" />
-                    <span className="text-[10px] text-muted-foreground uppercase font-bold">Avg Energy</span>
+                    <span className="text-[10px] text-muted-foreground uppercase font-bold">{t('networkOverview.avgEnergy')}</span>
                   </div>
                   <div className="text-xl font-bold">{meshStats.avgBattery ?? '—'}%</div>
                 </div>
@@ -853,7 +857,7 @@ export function NodeInfoPanel() {
               <div className="bg-secondary/20 rounded-xl p-4 border border-border/30">
                 <h4 className="text-[11px] font-bold text-muted-foreground uppercase mb-3 flex items-center gap-2">
                   <HardDrive className="w-3.5 h-3.5" />
-                  Hardware diversity
+                  {t('networkOverview.hardwareDiversity')}
                 </h4>
                 <div className="space-y-3">
                   {meshStats.sortedHw.map(([model, count]) => {
@@ -878,14 +882,14 @@ export function NodeInfoPanel() {
 
               {/* Connectivity Health */}
               <div className="bg-secondary/20 rounded-xl p-4 border border-border/30">
-                <h4 className="text-[11px] font-bold text-muted-foreground uppercase mb-3">Connectivity Health</h4>
+                <h4 className="text-[11px] font-bold text-muted-foreground uppercase mb-3">{t('networkOverview.connectivityHealth')}</h4>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs">Coordinate Coverage</span>
+                    <span className="text-xs">{t('networkOverview.coordinateCoverage')}</span>
                     <span className="text-xs font-mono">{Math.round((meshStats.withCoords / meshStats.total) * 100)}%</span>
                   </div>
                   <div className="flex items-center justify-between font-medium">
-                    <span className="text-xs">Network Relevancy</span>
+                    <span className="text-xs">{t('networkOverview.networkRelevancy')}</span>
                     <span className="text-xs font-mono">{Math.round((meshStats.online / meshStats.total) * 100)}%</span>
                   </div>
                 </div>
@@ -905,9 +909,9 @@ export function NodeInfoPanel() {
                     <MapIcon className="w-5 h-5" />
                   </div>
                   <div>
-                    <Dialog.Title className="text-lg font-bold">Global Mesh Network</Dialog.Title>
+                    <Dialog.Title className="text-lg font-bold">{t('networkOverview.globalMesh')}</Dialog.Title>
                     <Dialog.Description className="text-sm text-muted-foreground">
-                      {nodes.length} nodes registered • {nodes.filter(n => n.position).length} with position
+                      {nodes.length} {t('networkOverview.registered')} • {nodes.filter(n => n.position).length} {t('networkOverview.withPosition')}
                     </Dialog.Description>
                   </div>
                 </div>
@@ -941,7 +945,7 @@ export function NodeInfoPanel() {
   return (
     <div className="w-[360px] bg-card border-l border-border flex flex-col h-full">
       <div className="h-14 px-4 border-b border-border flex items-center justify-between">
-        <h2 className="font-semibold">Node Info</h2>
+        <h2 className="font-semibold">{t('nodeInfo.title')}</h2>
         <Button variant="ghost" size="icon" onClick={() => setSelectedNode(null)}>
           <X className="w-4 h-4" />
         </Button>
@@ -961,7 +965,7 @@ export function NodeInfoPanel() {
 
         {/* Last Heard */}
         <div className="mb-4">
-          <div className="text-xs text-muted-foreground uppercase mb-1">Last Heard</div>
+          <div className="text-xs text-muted-foreground uppercase mb-1">{t('nodeInfo.lastHeard')}</div>
           <p className="text-sm">{formatLastHeard(selectedNode.lastHeard)}</p>
         </div>
 
@@ -969,14 +973,14 @@ export function NodeInfoPanel() {
         {selectedNode.deviceMetrics && (
           <div className="mb-4 p-3 bg-secondary/50 rounded-lg space-y-2">
             <div className="text-xs text-muted-foreground uppercase mb-2">
-              Device Metrics
+              {t('nodeInfo.deviceMetrics')}
             </div>
 
             {selectedNode.deviceMetrics.batteryLevel !== undefined && (
               <div className="flex items-center justify-between text-sm">
                 <span className="flex items-center gap-2 text-muted-foreground">
                   <Battery className="w-4 h-4" />
-                  Battery
+                  {t('nodeInfo.battery')}
                 </span>
                 <span>{selectedNode.deviceMetrics.batteryLevel}%</span>
               </div>
@@ -986,7 +990,7 @@ export function NodeInfoPanel() {
               <div className="flex items-center justify-between text-sm">
                 <span className="flex items-center gap-2 text-muted-foreground">
                   <Cpu className="w-4 h-4" />
-                  Voltage
+                  {t('nodeInfo.voltage')}
                 </span>
                 <span>{selectedNode.deviceMetrics.voltage.toFixed(2)}V</span>
               </div>
@@ -994,14 +998,14 @@ export function NodeInfoPanel() {
 
             {typeof selectedNode.deviceMetrics.channelUtilization === 'number' && !Number.isNaN(selectedNode.deviceMetrics.channelUtilization) && (
               <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Channel Util</span>
+                <span className="text-muted-foreground">{t('nodeInfo.channelUtil')}</span>
                 <span>{selectedNode.deviceMetrics.channelUtilization.toFixed(1)}%</span>
               </div>
             )}
 
             {typeof selectedNode.deviceMetrics.airUtilTx === 'number' && !Number.isNaN(selectedNode.deviceMetrics.airUtilTx) && (
               <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Air Util TX</span>
+                <span className="text-muted-foreground">{t('nodeInfo.airUtilTx')}</span>
                 <span>{selectedNode.deviceMetrics.airUtilTx.toFixed(1)}%</span>
               </div>
             )}
@@ -1013,13 +1017,13 @@ export function NodeInfoPanel() {
           <div className="mb-4 p-3 bg-secondary/50 rounded-lg">
             <div className="text-xs text-muted-foreground uppercase mb-2 flex items-center gap-1">
               <MapPin className="w-3 h-3" />
-              Position
+              {t('nodeInfo.position')}
             </div>
             <div className="text-sm space-y-1">
-              <div>Lat: {selectedNode.position.latitude?.toFixed(6)}</div>
-              <div>Lon: {selectedNode.position.longitude?.toFixed(6)}</div>
+              <div>{t('nodeInfo.lat')} {selectedNode.position.latitude?.toFixed(6)}</div>
+              <div>{t('nodeInfo.lon')} {selectedNode.position.longitude?.toFixed(6)}</div>
               {selectedNode.position.altitude && (
-                <div>Alt: {selectedNode.position.altitude}m</div>
+                <div>{t('nodeInfo.alt')} {selectedNode.position.altitude}m</div>
               )}
             </div>
             <Dialog.Root open={isMapOpen} onOpenChange={setIsMapOpen}>
@@ -1042,13 +1046,13 @@ export function NodeInfoPanel() {
                 <Dialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-3xl -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-card p-4 shadow-xl border border-border focus:outline-none">
                   <Dialog.Title className="sr-only">{getNodeName(selectedNode)}</Dialog.Title>
                   <Dialog.Description className="sr-only">
-                    Координаты: {formatCoord(selectedNode.position.latitude)}, {formatCoord(selectedNode.position.longitude)}
+                    {t('nodeInfo.lat')} {formatCoord(selectedNode.position.latitude)}, {t('nodeInfo.lon')} {formatCoord(selectedNode.position.longitude)}
                   </Dialog.Description>
                   <div className="flex items-center justify-between mb-3">
                     <div>
                       <div className="text-base font-semibold">{getNodeName(selectedNode)}</div>
                       <div className="text-xs text-muted-foreground mt-0.5">
-                        Координаты: {formatCoord(selectedNode.position.latitude)}, {formatCoord(selectedNode.position.longitude)}
+                        {t('nodeInfo.lat')} {formatCoord(selectedNode.position.latitude)}, {t('nodeInfo.lon')} {formatCoord(selectedNode.position.longitude)}
                       </div>
                     </div>
                     <Dialog.Close asChild>
@@ -1065,7 +1069,7 @@ export function NodeInfoPanel() {
                     className="h-[420px] w-full"
                   />
                   <div className="mt-3 text-xs text-muted-foreground">
-                    Источник карты: OpenStreetMap (raster tiles, без API-ключей)
+                    {t('common.mapOSM')}
                   </div>
                 </Dialog.Content>
               </Dialog.Portal>
@@ -1096,7 +1100,7 @@ export function NodeInfoPanel() {
             size="lg"
           >
             <MessageSquare className="w-5 h-5 mr-2" />
-            Открыть чат
+            {t('common.openChat')}
           </Button>
 
           <Button
@@ -1110,7 +1114,7 @@ export function NodeInfoPanel() {
             ) : (
               <Route className="w-4 h-4 mr-2" />
             )}
-            Traceroute
+            {t('nodeInfo.traceroute')}
           </Button>
 
           {/* Timeout message */}
@@ -1118,9 +1122,9 @@ export function NodeInfoPanel() {
             <div className="mt-3 p-3 bg-secondary/40 border border-border/50 rounded-lg flex items-center justify-between">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Waiting for traceroute response…</span>
+                <span>{t('common.waitTraceroute')}</span>
               </div>
-              <span className="text-xs text-muted-foreground">Timeout in {tracerouteCountdown}s</span>
+              <span className="text-xs text-muted-foreground">{t('traceroute.timeout', { count: tracerouteCountdown })}</span>
             </div>
           )}
 
@@ -1128,10 +1132,10 @@ export function NodeInfoPanel() {
             <div className="mt-3 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
               <div className="flex items-center gap-2 text-sm text-destructive">
                 <AlertCircle className="w-4 h-4" />
-                <span>No response received (timeout after 60s)</span>
+                <span>{t('common.timeoutTraceroute')}</span>
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                Node may be offline or unreachable
+                {t('common.offlineWarning')}
               </p>
             </div>
           )}
@@ -1146,11 +1150,11 @@ export function NodeInfoPanel() {
                 <div className="p-3 bg-secondary/50 rounded-lg space-y-2">
                   <div className="flex items-center justify-between gap-2">
                     <div className="text-xs text-muted-foreground uppercase">
-                      Route on map
+                      {t('networkOverview.routeOnMap')}
                     </div>
                     <Button size="sm" variant="outline" onClick={() => setIsTraceMapOpen(true)}>
                       <MapIcon className="w-4 h-4 mr-2" />
-                      Open map
+                      {t('networkOverview.openMap')}
                     </Button>
                   </div>
                   {traceMapData.segments.length > 0 ? (
@@ -1167,7 +1171,7 @@ export function NodeInfoPanel() {
                     </div>
                   ) : (
                     <div className="rounded-lg border border-border/60 bg-card/80 p-3 text-xs text-muted-foreground">
-                      Нет координат для отображения маршрута на карте, но список хопов ниже.
+                      {t('traceroute.noCoordsMap')}
                     </div>
                   )}
                   <div className="text-xs text-muted-foreground flex flex-wrap gap-4">
@@ -1200,7 +1204,7 @@ export function NodeInfoPanel() {
                     </div>
                     {(traceMapData.pointsForward.some((p) => !p.hasCoords) || traceMapData.pointsBack.some((p) => !p.hasCoords)) && (
                       <div className="text-[11px] text-amber-600">
-                        Узлы без координат отмечены в списке ниже — линии обрываются на них.
+                        {t('traceroute.noCoordsSkip')}
                       </div>
                     )}
                   </div>
@@ -1290,7 +1294,7 @@ export function NodeInfoPanel() {
 
                   {traceMapData.unknown > 0 && (
                     <p className="text-[11px] text-muted-foreground">
-                      Некоторые узлы не прислали координаты — маршрут показан с пропусками.
+                      {t('traceroute.noCoordsSkip')}
                     </p>
                   )}
 
@@ -1298,14 +1302,14 @@ export function NodeInfoPanel() {
                     <Dialog.Portal>
                       <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50" />
                       <Dialog.Content className="fixed left-1/2 top-1/2 w-[92vw] max-w-5xl -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-card p-4 shadow-xl border border-border focus:outline-none z-50">
-                        <Dialog.Title className="sr-only">Маршрут сообщения</Dialog.Title>
+                        <Dialog.Title className="sr-only">{t('traceroute.messageRoute')}</Dialog.Title>
                         <Dialog.Description className="sr-only">
-                          Отображение маршрута трассировки на карте
+                          {t('traceroute.messageRoute')}
                         </Dialog.Description>
                         <div className="flex items-center justify-between mb-3">
                           <div className="font-semibold text-base flex items-center gap-2">
                             <MapIcon className="w-4 h-4" />
-                            Маршрут сообщения
+                            {t('traceroute.messageRoute')}
                           </div>
                           <Dialog.Close asChild>
                             <Button variant="ghost" size="icon">
@@ -1322,7 +1326,7 @@ export function NodeInfoPanel() {
                                 routeViewMode === 'forward' ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
                               )}
                             >
-                              Туда (Forward)
+                              {t('traceroute.forwardLabel')}
                             </button>
                             <button
                               onClick={() => setRouteViewMode('back')}
@@ -1331,7 +1335,7 @@ export function NodeInfoPanel() {
                                 routeViewMode === 'back' ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
                               )}
                             >
-                              Обратно (Back)
+                              {t('traceroute.backLabel')}
                             </button>
                           </div>
                         </div>
@@ -1345,36 +1349,36 @@ export function NodeInfoPanel() {
                           className="h-[520px]"
                         />
                         <div className="mt-3 text-xs text-muted-foreground flex flex-wrap gap-4">
-                          <span>Вперёд: {formatKm(traceMapData.distance.forward)}</span>
-                          <span>Назад: {traceMapData.distance.back ? formatKm(traceMapData.distance.back) : '—'}</span>
-                          <span className="font-medium text-foreground">Суммарно: {formatKm(traceMapData.distance.total)}</span>
+                          <span>{t('traceroute.forward')}: {formatKm(traceMapData.distance.forward)}</span>
+                          <span>{t('traceroute.back')}: {traceMapData.distance.back ? formatKm(traceMapData.distance.back) : '—'}</span>
+                          <span className="font-medium text-foreground">{t('traceroute.total')}: {formatKm(traceMapData.distance.total)}</span>
                         </div>
                         <div className="mt-3 text-xs text-muted-foreground space-y-1">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="inline-flex items-center gap-1">
-                              <span className="inline-block w-3 h-1.5 bg-blue-600 rounded-sm" /> прямой маршрут
+                              <span className="inline-block w-3 h-1.5 bg-blue-600 rounded-sm" /> {t('traceroute.routeLabels.forward')}
                             </span>
                             <span className="inline-flex items-center gap-1">
-                              <span className="inline-block w-3 h-1.5 bg-green-600 rounded-sm border border-border" /> обратный маршрут
+                              <span className="inline-block w-3 h-1.5 bg-green-600 rounded-sm border border-border" /> {t('traceroute.routeLabels.back')}
                             </span>
                             {traceMapData.segments.some((s) => s.approximate) && (
                               <span className="inline-flex items-center gap-1">
-                                <span className="inline-block w-3 h-1.5 bg-slate-400 rounded-sm border border-border" /> участок с неизвестными хопами
+                                <span className="inline-block w-3 h-1.5 bg-slate-400 rounded-sm border border-border" /> {t('traceroute.routeLabels.unknown')}
                               </span>
                             )}
                             <span className="inline-flex items-center gap-1">
-                              <span className="inline-block w-3 h-3 rounded-full bg-blue-600" /> начало
+                              <span className="inline-block w-3 h-3 rounded-full bg-blue-600" /> {t('traceroute.routeLabels.start')}
                             </span>
                             <span className="inline-flex items-center gap-1">
-                              <span className="inline-block w-3 h-3 rounded-full bg-green-600" /> цель
+                              <span className="inline-block w-3 h-3 rounded-full bg-green-600" /> {t('traceroute.routeLabels.goal')}
                             </span>
                             <span className="inline-flex items-center gap-1">
-                              <span className="inline-block w-3 h-3 rounded-full bg-amber-500" /> hop
+                              <span className="inline-block w-3 h-3 rounded-full bg-amber-500" /> {t('traceroute.routeLabels.hop')}
                             </span>
                           </div>
                           {traceMapData.unknown > 0 && (
                             <div className="text-[11px] text-amber-600">
-                              Есть узлы без координат — линии обрываются на них.
+                              {t('traceroute.noCoordsWarning')}
                             </div>
                           )}
                         </div>
@@ -1384,7 +1388,7 @@ export function NodeInfoPanel() {
                             <div className="bg-card border border-border/60 rounded-lg divide-y divide-border/60">
                               <div className="px-3 py-2 font-semibold flex items-center gap-2">
                                 <span className="inline-block w-3 h-1.5 bg-blue-600 rounded-sm" />
-                                Прямой маршрут
+                                {t('traceroute.forwardRoute')}
                               </div>
                               {traceMapData.pointsForward.map((p, idx) => (
                                 <div key={`${p.id}-${p.direction}-${idx}`} className="flex items-center justify-between px-3 py-2">
@@ -1424,7 +1428,7 @@ export function NodeInfoPanel() {
                             <div className="bg-card border border-border/60 rounded-lg divide-y divide-border/60">
                               <div className="px-3 py-2 font-semibold flex items-center gap-2">
                                 <span className="inline-block w-3 h-1.5 bg-green-600 rounded-sm" />
-                                Обратный маршрут
+                                {t('traceroute.backRoute')}
                               </div>
                               {traceMapData.pointsBack.map((p, idx) => (
                                 <div key={`${p.id}-${p.direction}-${idx}`} className="flex items-center justify-between px-3 py-2">
@@ -1463,7 +1467,7 @@ export function NodeInfoPanel() {
 
                         {traceMapData.unknown > 0 && (
                           <p className="mt-2 text-xs text-muted-foreground">
-                            Есть узлы без координат — линии обрываются на них.
+                            {t('traceroute.noCoordsWarning')}
                           </p>
                         )}
                       </Dialog.Content>

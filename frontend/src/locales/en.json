@@ -1,0 +1,125 @@
+{
+    "common": {
+        "unknown": "Unknown",
+        "waiting": "Wait...",
+        "none": "—",
+        "me": "Me",
+        "meLocal": "Me (Local Node)",
+        "notConnected": "Not connected",
+        "noConnection": "No connection",
+        "openChat": "Open Chat",
+        "waitTraceroute": "Waiting for traceroute response...",
+        "timeoutTraceroute": "No response received (timeout after 60s)",
+        "offlineWarning": "Node may be offline or unreachable",
+        "mapOSM": "Map Source: OpenStreetMap (raster tiles, no API keys required)"
+    },
+    "sidebar": {
+        "search": "Search...",
+        "searchTitle": "Search",
+        "sortTitle": "Sort",
+        "sortByName": "By Name",
+        "sortByActivity": "By Activity",
+        "unread": "Unread",
+        "channels": "Channels",
+        "nodes": "Nodes",
+        "meshtastic": "Meshtastic"
+    },
+    "connection": {
+        "connected": "Connected",
+        "disconnected": "Disconnected",
+        "details": "Connection Details",
+        "type": "Type:",
+        "node": "Node:",
+        "address": "Address:",
+        "connect": "Connect",
+        "disconnect": "Disconnect",
+        "tcp": "TCP",
+        "serial": "Serial"
+    },
+    "chat": {
+        "selectChat": "Select a channel or node",
+        "chooseSidebar": "Choose from the sidebar to start messaging",
+        "connectToStart": "Connect to a Meshtastic node to start chatting",
+        "openMap": "Open Network Map",
+        "channel": "Channel",
+        "directMessage": "Direct Message",
+        "noMessages": "No messages yet. Start the conversation!",
+        "replyingTo": "Replying to {{name}}",
+        "messagePlaceholder": "Message {{name}}...",
+        "openMapLabel": "Open Map"
+    },
+    "nodeInfo": {
+        "title": "Node Info",
+        "unknownNode": "Unknown Node",
+        "lastHeard": "Last Heard",
+        "deviceMetrics": "Device Metrics",
+        "battery": "Battery",
+        "voltage": "Voltage",
+        "channelUtil": "Channel Util",
+        "airUtilTx": "Air Util TX",
+        "position": "Position",
+        "lat": "Lat:",
+        "lon": "Lon:",
+        "alt": "Alt:",
+        "traceroute": "Traceroute",
+        "requestTraceroute": "Request Traceroute",
+        "ago": {
+            "seconds": "{{count}}s ago",
+            "minutes": "{{count}}m ago",
+            "hours": "{{count}}h ago",
+            "days": "{{count}}d ago"
+        },
+        "duration": {
+            "seconds": "{{count}}s",
+            "minutes": "{{count}}m",
+            "hours": "{{count}}h",
+            "days": "{{count}}d"
+        },
+        "unknownHop": "Unknown hop {{index}}",
+        "distance": {
+            "km": "{{value}} km",
+            "m": "{{value}} m"
+        }
+    },
+    "networkOverview": {
+        "map": "Network Map",
+        "fullscreen": "Fullscreen",
+        "openGlobalMap": "Open Global Map",
+        "activeNodes": "Active Nodes",
+        "avgEnergy": "Avg Energy",
+        "hardwareDiversity": "Hardware diversity",
+        "connectivityHealth": "Connectivity Health",
+        "coordinateCoverage": "Coordinate Coverage",
+        "networkRelevancy": "Network Relevancy",
+        "globalMesh": "Global Mesh Network",
+        "registered": "registered",
+        "withPosition": "with position",
+        "meshIntelligence": "Mesh Intelligence",
+        "nodesCount": "{{count}} nodes",
+        "routeOnMap": "Route on map",
+        "openMap": "Open Map"
+    },
+    "traceroute": {
+        "forward": "Forward",
+        "back": "Back",
+        "total": "Total",
+        "forwardRoute": "Forward Route",
+        "backRoute": "Back Route",
+        "noCoordsWarning": "Some nodes lack coordinates — lines end there.",
+        "noCoordsMap": "No coordinates to display the route on the map, but the hop list is below.",
+        "noCoordsSkip": "Some nodes did not send coordinates — the route is shown with gaps.",
+        "messageRoute": "Message Route",
+        "forwardLabel": "Forward",
+        "backLabel": "Back",
+        "routeLabels": {
+            "start": "start",
+            "goal": "goal",
+            "hop": "hop",
+            "forward": "forward route",
+            "back": "back route",
+            "unknown": "unknown hops area"
+        },
+        "noCoords": "no coordinates",
+        "timeout": "Timeout in {{count}}s"
+    }
+}
