@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Hash, User, Battery, Signal, ArrowUpDown, Search, X } from 'lucide-react'
+import { Hash, User, Battery, Signal, ArrowUpDown, Search, X, Globe, Check } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Button } from '@/components/ui/button'
@@ -20,7 +20,7 @@ export function Sidebar() {
   const { currentChat, setActiveTab, setSelectedNode, selectedNode, getUnreadForChat, setIsNetworkMapOpen } = useMeshStore()
   const { data: nodes } = useNodes()
   const { data: channels } = useChannels()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [sortBy, setSortBy] = useState<SortType>('name')
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -126,6 +126,35 @@ export function Sidebar() {
           <Hash className="w-5 h-5" />
           MeshRadar
         </div>
+
+        {/* Language Switcher */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-lg hover:bg-secondary/60 transition-colors"
+            >
+              <Globe className="w-4 h-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-40">
+            <DropdownMenuItem
+              onClick={() => i18n.changeLanguage('en')}
+              className="cursor-pointer flex items-center justify-between"
+            >
+              <span>English</span>
+              {i18n.language.startsWith('en') && <Check className="w-4 h-4" />}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => i18n.changeLanguage('ru')}
+              className="cursor-pointer flex items-center justify-between"
+            >
+              <span>Русский</span>
+              {i18n.language.startsWith('ru') && <Check className="w-4 h-4" />}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <ConnectionPanel />

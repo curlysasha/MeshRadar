@@ -798,7 +798,7 @@ export function NodeInfoPanel() {
             </div>
             <div>
               <h3 className="font-semibold text-sm leading-tight">{t('networkOverview.map')}</h3>
-              <p className="text-[10px] text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 {t('networkOverview.nodesCount', { count: nodes.length })}
               </p>
             </div>
