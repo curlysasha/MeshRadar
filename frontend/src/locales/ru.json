@@ -22,7 +22,7 @@
         "unread": "Непрочитанные",
         "channels": "Каналы",
         "nodes": "Узлы",
-        "meshtastic": "Meshtastic"
+        "meshtastic": "MeshRadar"
     },
     "connection": {
         "connected": "Подключено",
@@ -39,7 +39,7 @@
     "chat": {
         "selectChat": "Выберите канал или узел",
         "chooseSidebar": "Выберите в боковой панели, чтобы начать общение",
-        "connectToStart": "Подключитесь к узлу Meshtastic, чтобы начать чат",
+        "connectToStart": "Подключитесь к узлу MeshRadar, чтобы начать чат",
         "openMap": "Открыть карту сети",
         "channel": "Канал",
         "directMessage": "Личное сообщение",

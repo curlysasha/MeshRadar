@@ -124,7 +124,7 @@ export function Sidebar() {
           onClick={() => setIsNetworkMapOpen(true)}
         >
           <Hash className="w-5 h-5" />
-          Meshtastic
+          MeshRadar
         </div>
       </div>
 

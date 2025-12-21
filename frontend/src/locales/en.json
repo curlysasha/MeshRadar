@@ -22,7 +22,7 @@
         "unread": "Unread",
         "channels": "Channels",
         "nodes": "Nodes",
-        "meshtastic": "Meshtastic"
+        "meshtastic": "MeshRadar"
     },
     "connection": {
         "connected": "Connected",
@@ -39,7 +39,7 @@
     "chat": {
         "selectChat": "Select a channel or node",
         "chooseSidebar": "Choose from the sidebar to start messaging",
-        "connectToStart": "Connect to a Meshtastic node to start chatting",
+        "connectToStart": "Connect to a MeshRadar node to start chatting",
         "openMap": "Open Network Map",
         "channel": "Channel",
         "directMessage": "Direct Message",

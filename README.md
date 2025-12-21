@@ -1,4 +1,4 @@
-# Meshtastic Web Interface
+# MeshRadar
 
 Современный веб-интерфейс для управления Meshtastic mesh-сетью. Поддерживает подключение по Serial и TCP.
 
@@ -46,7 +46,14 @@ npm run dev
 
 Frontend запустится на http://localhost:5173
 
+## Релиз (Портативная версия)
+
+Для сборки автономного `.exe` файла:
+1. Запустите `build.bat` в корне проекта.
+2. Готовый файл и README будут в папке `dist/MeshRadar.exe`.
+
 ## API
+... (остальное без изменений)
 
 ### REST Endpoints
 

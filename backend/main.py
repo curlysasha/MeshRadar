@@ -68,7 +68,7 @@ async def lifespan(app: FastAPI):
     await db.close_db()
 
 
-app = FastAPI(title="Meshtastic Web Interface", lifespan=lifespan)
+app = FastAPI(title="MeshRadar", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,

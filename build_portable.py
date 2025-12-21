@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Скрипт сборки портативной версии Meshtastic Web Interface.
+Скрипт сборки портативной версии MeshRadar.
 
 Требования:
 - Python 3.10+
@@ -75,7 +75,7 @@ def build_backend():
             run_command([sys.executable, "-m", "pip", "install", "pyinstaller"])
 
     # Используем spec файл для сборки
-    spec_file = BACKEND_DIR / "MeshtasticWeb.spec"
+    spec_file = BACKEND_DIR / "MeshRadar.spec"
 
     run_command([
         sys.executable, "-m", "PyInstaller",
@@ -102,11 +102,11 @@ def create_readme():
     """Создание README для портативной версии."""
     readme = DIST_DIR / "README.txt"
     readme.write_text("""
-Meshtastic Web Interface - Портативная версия
-=============================================
+MeshRadar - Портативная версия
+==============================
 
 Запуск:
-1. Запустите MeshtasticWeb.exe
+1. Запустите MeshRadar.exe
 2. Браузер откроется автоматически на http://localhost:8000
 3. Подключите Meshtastic ноду по Serial или TCP
 
@@ -122,7 +122,7 @@ Meshtastic Web Interface - Портативная версия
 
 def main():
     print("=" * 50)
-    print("Сборка портативной версии Meshtastic Web Interface")
+    print("Сборка портативной версии MeshRadar")
     print("=" * 50)
 
     clean()
@@ -133,7 +133,7 @@ def main():
 
     print("\n" + "=" * 50)
     print("Сборка завершена!")
-    print(f"Результат: {DIST_DIR / 'MeshtasticWeb.exe'}")
+    print(f"Результат: {DIST_DIR / 'MeshRadar.exe'}")
     print("=" * 50)
 
 
