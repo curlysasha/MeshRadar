@@ -1,11 +1,12 @@
 import asyncio
 import logging
-from typing import Optional, Dict, Any, Set
+from typing import Optional, Dict, Any, Set, List
 from concurrent.futures import Future
 from pubsub import pub
 import meshtastic
 import meshtastic.serial_interface
 import meshtastic.tcp_interface
+import meshtastic.ble_interface
 from google.protobuf.json_format import MessageToDict
 
 from websocket_manager import ws_manager
@@ -74,6 +75,53 @@ class MeshtasticManager:
             return True
         except Exception as e:
             logger.error(f"TCP connection error: {e}")
+            self._unsubscribe_all()
+            self.interface = None
+            return False
+
+    def scan_ble_devices(self) -> List[Dict[str, str]]:
+        """Scan for available BLE Meshtastic devices.
+
+        Returns:
+            List of dicts with 'name' and 'address' keys
+        """
+        try:
+            logger.info("Scanning for BLE devices (takes 10 seconds)...")
+            devices = meshtastic.ble_interface.BLEInterface.scan()
+
+            results = []
+            for device in devices:
+                results.append({
+                    "name": device.name or f"Unknown ({device.address})",
+                    "address": device.address
+                })
+
+            logger.info(f"Found {len(results)} BLE device(s)")
+            return results
+        except Exception as e:
+            logger.error(f"BLE scan error: {e}")
+            return []
+
+    def connect_ble(self, address: str) -> bool:
+        """Connect to a Meshtastic device via BLE.
+
+        Args:
+            address: BLE device address (MAC address like F4:12:FA:D0:45:AB)
+
+        Returns:
+            True if connection successful, False otherwise
+        """
+        self.disconnect()
+        # Subscribe before opening interface to catch queued messages delivered immediately on connect
+        self._setup_callbacks()
+        try:
+            self.interface = meshtastic.ble_interface.BLEInterface(address=address)
+            self.connection_type = "ble"
+            self.address = address
+            logger.info(f"Connected via BLE: {address}")
+            return True
+        except Exception as e:
+            logger.error(f"BLE connection error: {e}")
             self._unsubscribe_all()
             self.interface = None
             return False

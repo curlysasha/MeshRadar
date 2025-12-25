@@ -4,7 +4,7 @@ from datetime import datetime
 
 
 class ConnectRequest(BaseModel):
-    type: Literal["serial", "tcp"]
+    type: Literal["serial", "tcp", "ble"]
     address: str
 
 

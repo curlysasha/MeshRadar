@@ -14,6 +14,13 @@ services:
     #   - /dev/ttyUSB0:/dev/ttyUSB0
     # privileged: true
 
+    # To use BLE (Bluetooth) connection on Linux, uncomment the lines below:
+    # privileged: true
+    # volumes:
+    #   - meshradar_data:/app/backend/data
+    #   - /var/run/dbus:/var/run/dbus
+    #   - /run/bluetooth:/run/bluetooth
+
 
 volumes:
   meshradar_data:

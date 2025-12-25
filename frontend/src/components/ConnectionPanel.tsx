@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Wifi, Usb, Loader2 } from 'lucide-react'
+import { Wifi, Usb, Loader2, Bluetooth } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -8,12 +8,14 @@ import { useMeshStore } from '@/store'
 import { cn } from '@/lib/utils'
 
 export function ConnectionPanel() {
-  const [type, setType] = useState<'tcp' | 'serial'>(() => {
-    return (localStorage.getItem('meshtastic_connection_type') as 'tcp' | 'serial') || 'tcp'
+  const [type, setType] = useState<'tcp' | 'serial' | 'ble'>(() => {
+    return (localStorage.getItem('meshtastic_connection_type') as 'tcp' | 'serial' | 'ble') || 'tcp'
   })
   const [address, setAddress] = useState(() => {
     return localStorage.getItem('meshtastic_last_address') || '192.168.1.1'
   })
+  const [bleDevices, setBleDevices] = useState<Array<{ name: string; address: string }>>([])
+  const [bleScanning, setBleScanning] = useState(false)
   const { t } = useTranslation()
   const status = useMeshStore((s) => s.status)
 
@@ -36,6 +38,19 @@ export function ConnectionPanel() {
 
   const handleDisconnect = () => {
     disconnect.mutate()
+  }
+
+  const handleBleScan = async () => {
+    setBleScanning(true)
+    try {
+      const response = await fetch('/api/ble-scan')
+      const data = await response.json()
+      setBleDevices(data.devices || [])
+    } catch (error) {
+      console.error('BLE scan error:', error)
+    } finally {
+      setBleScanning(false)
+    }
   }
 
   return (
@@ -73,14 +88,55 @@ export function ConnectionPanel() {
               <Usb className="w-4 h-4 mr-1" />
               {t('connection.serial')}
             </Button>
+            <Button
+              variant={type === 'ble' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setType('ble')}
+              className="flex-1"
+            >
+              <Bluetooth className="w-4 h-4 mr-1" />
+              BLE
+            </Button>
           </div>
 
-          <Input
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            placeholder={type === 'tcp' ? '192.168.1.1:4403' : '/dev/ttyUSB0'}
-            className="mb-3"
-          />
+          {type === 'ble' ? (
+            <>
+              <Button
+                onClick={handleBleScan}
+                disabled={bleScanning}
+                variant="outline"
+                size="sm"
+                className="w-full mb-3"
+              >
+                {bleScanning ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : null}
+                {bleScanning ? t('common.scanning') : 'Scan BLE Devices'}
+              </Button>
+
+              {bleDevices.length > 0 && (
+                <select
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  className="w-full mb-3 px-3 py-2 border border-border rounded-md bg-background text-sm"
+                >
+                  <option value="">Select a device...</option>
+                  {bleDevices.map((device) => (
+                    <option key={device.address} value={device.address}>
+                      {device.name} ({device.address})
+                    </option>
+                  ))}
+                </select>
+              )}
+            </>
+          ) : (
+            <Input
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder={type === 'tcp' ? '192.168.1.1:4403' : '/dev/ttyUSB0'}
+              className="mb-3"
+            />
+          )}
 
           <Button
             onClick={handleConnect}

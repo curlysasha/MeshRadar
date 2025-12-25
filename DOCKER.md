@@ -29,6 +29,38 @@ If you want to use USB/Serial connection directly in Docker:
    docker-compose up -d
    ```
 
+### BLE (Bluetooth) Connection
+For BLE connections, you can use the "Scan BLE Devices" feature in the web UI without special Docker configuration on most systems. However, for better BLE support on Linux with Docker:
+
+1. Ensure Bluetooth service is running on host:
+   ```bash
+   sudo systemctl start bluetooth
+   ```
+
+2. **On Linux**: Make sure you're in the `bluetooth` group or use `sudo`:
+   ```bash
+   # Add current user to bluetooth group (requires logout/login)
+   sudo usermod -a -G bluetooth $USER
+
+   # Or run Docker with sudo
+   sudo docker-compose up -d
+   ```
+
+3. For advanced BLE support, optionally add to `docker-compose.yml`:
+   ```yaml
+   privileged: true
+   volumes:
+     - /var/run/dbus:/var/run/dbus
+     - /run/bluetooth:/run/bluetooth
+   ```
+
+4. Start the container:
+   ```bash
+   docker-compose up -d
+   ```
+
+**Note**: BLE typically works better over TCP connection. Use "Scan BLE Devices" feature in the UI to find your device and then connect via TCP if BLE connection is unstable.
+
 ## Environment Variables
 
 Create a `.env` file in the project root:

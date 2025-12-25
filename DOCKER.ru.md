@@ -29,6 +29,38 @@ docker-compose up -d
    docker-compose up -d
    ```
 
+### BLE (Bluetooth) подключение
+Для подключения по BLE вы можете использовать функцию "Сканирование BLE" в веб-интерфейсе без специальной конфигурации Docker на большинстве систем. Однако, для улучшенной поддержки BLE на Linux:
+
+1. Убедитесь, что служба Bluetooth запущена на хосте:
+   ```bash
+   sudo systemctl start bluetooth
+   ```
+
+2. **На Linux**: Убедитесь, что вы находитесь в группе `bluetooth` или используйте `sudo`:
+   ```bash
+   # Добавить текущего пользователя в группу bluetooth (требуется выход и вход)
+   sudo usermod -a -G bluetooth $USER
+
+   # Или запустить Docker с sudo
+   sudo docker-compose up -d
+   ```
+
+3. Для расширенной поддержки BLE, опционально добавьте в `docker-compose.yml`:
+   ```yaml
+   privileged: true
+   volumes:
+     - /var/run/dbus:/var/run/dbus
+     - /run/bluetooth:/run/bluetooth
+   ```
+
+4. Запустите контейнер:
+   ```bash
+   docker-compose up -d
+   ```
+
+**Примечание**: BLE работает лучше через TCP подключение. Используйте функцию "Сканирование BLE" в интерфейсе для поиска устройства, затем подключитесь через TCP если BLE подключение нестабильно.
+
 ## Переменные окружения
 
 Создайте файл `.env` в корне проекта:

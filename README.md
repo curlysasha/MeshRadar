@@ -39,7 +39,7 @@
 
 | Feature             | Description                                                    |
 | ------------------- | -------------------------------------------------------------- |
-| 🔌 **Connection**   | Serial (USB) and TCP (WiFi) to Meshtastic nodes                |
+| 🔌 **Connection**   | Serial (USB), TCP (WiFi), and BLE (Bluetooth) to Meshtastic nodes |
 | 💬 **Chat**         | Channels and direct messages with delivery confirmation (✓ ✓✓) |
 | 📊 **Node List**    | All mesh nodes with telemetry (battery, SNR, position)         |
 | 🗺️ **Network Map**  | Interactive map visualization of all nodes                     |
@@ -121,6 +121,7 @@ Then open http://localhost:5173 and connect to your Meshtastic device through th
 | `POST` | `/api/connect`         | Connect to node    |
 | `POST` | `/api/disconnect`      | Disconnect         |
 | `GET`  | `/api/status`          | Connection status  |
+| `GET`  | `/api/ble-scan`        | Scan BLE devices   |
 | `GET`  | `/api/nodes`           | List of nodes      |
 | `GET`  | `/api/node/{id}`       | Node information   |
 | `GET`  | `/api/channels`        | List of channels   |
@@ -159,6 +160,18 @@ curl -X POST http://localhost:8000/api/connect \
 curl -X POST http://localhost:8000/api/connect \
   -H "Content-Type: application/json" \
   -d '{"type": "serial", "address": "/dev/ttyUSB0"}'
+```
+
+**BLE Connection (scan first):**
+
+```bash
+# Scan for available BLE devices
+curl http://localhost:8000/api/ble-scan
+
+# Connect to BLE device
+curl -X POST http://localhost:8000/api/connect \
+  -H "Content-Type: application/json" \
+  -d '{"type": "ble", "address": "F4:12:FA:D0:45:AB"}'
 ```
 
 **Send Message:**

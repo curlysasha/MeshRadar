@@ -117,6 +117,8 @@ async def connect(request: ConnectRequest):
         except ValueError:
             raise HTTPException(status_code=400, detail="Invalid port number")
         success = mesh_manager.connect_tcp(host, port)
+    elif request.type == "ble":
+        success = mesh_manager.connect_ble(request.address)
 
     if success:
         await db.save_setting("last_connection_type", request.type)
@@ -130,6 +132,13 @@ async def connect(request: ConnectRequest):
 async def disconnect():
     mesh_manager.disconnect()
     return {"success": True}
+
+
+@app.get("/api/ble-scan")
+async def scan_ble_devices():
+    """Scan for available BLE Meshtastic devices."""
+    devices = mesh_manager.scan_ble_devices()
+    return {"devices": devices}
 
 
 @app.get("/api/status", response_model=ConnectionStatus)
