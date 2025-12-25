@@ -18,7 +18,8 @@
 
 [![Download MeshRadar](https://img.shields.io/badge/Download-MeshRadar.exe-brightgreen?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/curlysasha/meshtastic-web/releases/latest)
 
-[Features](#-features) • [Quick Start](#-quick-start) • [API](#-api) • [Technologies](#-technologies)
+[Features](#-features) • [Quick Start](#-quick-start) • [API](#-api) •
+[Technologies](#-technologies)
 
 </div>
 
@@ -36,16 +37,16 @@
 
 ## ✨ Features
 
-| Feature | Description |
-|---------|-------------|
-| 🔌 **Connection** | Serial (USB) and TCP (WiFi) to Meshtastic nodes |
-| 💬 **Chat** | Channels and direct messages with delivery confirmation (✓ ✓✓) |
-| 📊 **Node List** | All mesh nodes with telemetry (battery, SNR, position) |
-| 🗺️ **Network Map** | Interactive map visualization of all nodes |
-| 🛤️ **Traceroute** | Message route visualization between nodes |
-| 💾 **History** | Messages stored in SQLite database |
-| ⚡ **Real-time** | WebSocket for instant updates |
-| 🌍 **Multilingual** | Russian and English with switcher |
+| Feature             | Description                                                    |
+| ------------------- | -------------------------------------------------------------- |
+| 🔌 **Connection**   | Serial (USB) and TCP (WiFi) to Meshtastic nodes                |
+| 💬 **Chat**         | Channels and direct messages with delivery confirmation (✓ ✓✓) |
+| 📊 **Node List**    | All mesh nodes with telemetry (battery, SNR, position)         |
+| 🗺️ **Network Map**  | Interactive map visualization of all nodes                     |
+| 🛤️ **Traceroute**   | Message route visualization between nodes                      |
+| 💾 **History**      | Messages stored in SQLite database                             |
+| ⚡ **Real-time**    | WebSocket for instant updates                                  |
+| 🌍 **Multilingual** | Russian and English with switcher                              |
 
 ---
 
@@ -94,21 +95,45 @@ Output file: `dist/MeshRadar.exe`
 
 ---
 
+## 🐳 Docker-compose Version
+
+```bash
+cp .env.example .env
+```
+
+Change your meshtastic device in `.env`
+
+Run with logs:
+
+```bash
+docker-compose up --build
+```
+
+Or run as a daemon:
+
+```bash
+docker-compose up --build -d
+```
+
+> App will be avaliable at [http://localhost:5173](http://localhost:5173)
+
+---
+
 ## 🔌 API
 
 ### REST Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/connect` | Connect to node |
-| `POST` | `/api/disconnect` | Disconnect |
-| `GET` | `/api/status` | Connection status |
-| `GET` | `/api/nodes` | List of nodes |
-| `GET` | `/api/node/{id}` | Node information |
-| `GET` | `/api/channels` | List of channels |
-| `POST` | `/api/message` | Send message |
+| Method | Endpoint               | Description        |
+| ------ | ---------------------- | ------------------ |
+| `POST` | `/api/connect`         | Connect to node    |
+| `POST` | `/api/disconnect`      | Disconnect         |
+| `GET`  | `/api/status`          | Connection status  |
+| `GET`  | `/api/nodes`           | List of nodes      |
+| `GET`  | `/api/node/{id}`       | Node information   |
+| `GET`  | `/api/channels`        | List of channels   |
+| `POST` | `/api/message`         | Send message       |
 | `POST` | `/api/traceroute/{id}` | Traceroute to node |
-| `GET` | `/api/messages` | Message history |
+| `GET`  | `/api/messages`        | Message history    |
 
 ### WebSocket Events
 
@@ -128,6 +153,7 @@ ws://localhost:8000/ws
 <summary><b>📝 API Usage Examples</b></summary>
 
 **TCP Connection:**
+
 ```bash
 curl -X POST http://localhost:8000/api/connect \
   -H "Content-Type: application/json" \
@@ -135,6 +161,7 @@ curl -X POST http://localhost:8000/api/connect \
 ```
 
 **Serial Connection:**
+
 ```bash
 curl -X POST http://localhost:8000/api/connect \
   -H "Content-Type: application/json" \
@@ -142,6 +169,7 @@ curl -X POST http://localhost:8000/api/connect \
 ```
 
 **Send Message:**
+
 ```bash
 curl -X POST http://localhost:8000/api/message \
   -H "Content-Type: application/json" \
@@ -159,6 +187,7 @@ curl -X POST http://localhost:8000/api/message \
 <td width="50%">
 
 ### Backend
+
 - **FastAPI** — async web framework
 - **meshtastic** — Python library
 - **aiosqlite** — async SQLite
@@ -168,6 +197,7 @@ curl -X POST http://localhost:8000/api/message \
 <td width="50%">
 
 ### Frontend
+
 - **React 18** + TypeScript
 - **Tailwind CSS** — styling
 - **Zustand** — state management
@@ -224,9 +254,11 @@ cd frontend && npm run build
 
 GPLv3 + Commons Clause © 2024
 
-This project is licensed under GPLv3 with Commons Clause - see the [LICENSE](LICENSE) file for details.
+This project is licensed under GPLv3 with Commons Clause - see the
+[LICENSE](LICENSE) file for details.
 
-> **Note**: The Commons Clause means you can use, modify, and distribute this software freely, but you cannot sell it or offer it as a paid service.
+> **Note**: The Commons Clause means you can use, modify, and distribute this
+> software freely, but you cannot sell it or offer it as a paid service.
 
 ---
 
@@ -238,6 +270,7 @@ If you find MeshRadar useful, please consider supporting its development:
 [![Boosty](https://img.shields.io/badge/Boosty-Support-F15F2C?style=for-the-badge)](https://boosty.to/curlysasha)
 
 **Crypto donations:**
+
 - **USDT TRC20**: `TL2rEf6iNzhC9Mb2grm6S5iq5JrMxYDEZG`
 - **USDT TON**: `UQDyYPHzm6tb4KbpLIMo-KEWC2PmPHnU2Zj4tndLg9O70-w8`
 
