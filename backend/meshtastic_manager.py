@@ -315,6 +315,21 @@ class MeshtasticManager:
                 return [deep_convert(item) for item in obj]
             return obj
 
+        # Check if node is favorite - can be stored in different ways depending on meshtastic version
+        is_favorite = False
+
+        # Debug: log available keys
+        node_id = node.get("user", {}).get("id") if user else None
+        logger.debug(f"Node {node_id} keys: {list(node.keys())}")
+
+        if "isFavorite" in node:
+            is_favorite = node.get("isFavorite", False)
+        # Also check for is_favorite (snake_case variant)
+        elif "is_favorite" in node:
+            is_favorite = node.get("is_favorite", False)
+
+        logger.debug(f"Node {node_id} isFavorite: {is_favorite}")
+
         return {
             "id": node.get("user", {}).get("id") if user else None,
             "num": node.get("num"),
@@ -323,7 +338,7 @@ class MeshtasticManager:
             "snr": node.get("snr"),
             "lastHeard": node.get("lastHeard"),
             "deviceMetrics": deep_convert(device_metrics),
-            "isFavorite": node.get("isFavorite", False)
+            "isFavorite": is_favorite
         }
 
     def get_nodes(self) -> list:
@@ -429,25 +444,43 @@ class MeshtasticManager:
         """Set favorite status for a node.
 
         Args:
-            node_id: Node ID in format "!12345678"
+            node_id: Node ID in format "!12345678" or as string
             is_favorite: True to mark as favorite, False to unmark
 
         Returns:
             True if successful, False otherwise
         """
-        if not self.interface:
+        if not self.interface or not self.interface.localNode:
             logger.error("Not connected to device")
             return False
 
         try:
-            # Get the node number from ID (remove "!" prefix)
-            if node_id.startswith("!"):
-                node_num = int(node_id[1:], 16)
+            # Use the built-in setFavorite/removeFavorite methods from localNode
+            # These handle all the admin message complexity internally
+            if is_favorite:
+                self.interface.localNode.setFavorite(node_id)
             else:
-                node_num = int(node_id, 16)
+                self.interface.localNode.removeFavorite(node_id)
 
-            # Call meshtastic setFavorite method
-            self.interface.setFavorite(node_num, is_favorite)
+            # Update local cache immediately so the UI reflects the change without waiting for device response
+            # Find the node in our cache and update it
+            # Convert node_id to a comparable format
+            node_hex = node_id if node_id.startswith("!") else f"!{node_id}"
+
+            # Find and update the node in interface.nodes cache
+            if hasattr(self.interface, 'nodes') and self.interface.nodes:
+                for node_num, node_data in self.interface.nodes.items():
+                    # Get the node's user ID
+                    user_id = node_data.get("user", {}).get("id") if isinstance(node_data.get("user"), dict) else None
+                    if user_id == node_hex or user_id == node_id:
+                        # Update the isFavorite field in the cached node
+                        if "isFavorite" not in node_data:
+                            node_data["isFavorite"] = is_favorite
+                        else:
+                            node_data["isFavorite"] = is_favorite
+                        logger.debug(f"Updated local cache for node {node_id}: isFavorite={is_favorite}")
+                        break
+
             logger.info(f"Set favorite={is_favorite} for node {node_id}")
             return True
         except Exception as e:
