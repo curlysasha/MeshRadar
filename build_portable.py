@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-Скрипт сборки портативной версии MeshRadar.
+Build script for MeshRadar portable version.
 
-Требования:
+Requirements:
 - Python 3.10+
 - Node.js 18+
 - PyInstaller: pip install pyinstaller
 
-Использование:
+Usage:
     python build_portable.py
 """
 
@@ -24,57 +24,57 @@ BUILD_DIR = ROOT_DIR / "build"
 
 
 def run_command(cmd: list, cwd: Path = None):
-    """Выполняет команду и проверяет результат."""
+    """Runs command and checks result."""
     print(f">>> {' '.join(cmd)}")
     result = subprocess.run(cmd, cwd=cwd, shell=sys.platform == "win32")
     if result.returncode != 0:
-        print(f"Ошибка выполнения: {' '.join(cmd)}")
+        print(f"Error running: {' '.join(cmd)}")
         sys.exit(1)
 
 
 def clean():
-    """Очистка предыдущих сборок."""
-    print("\n=== Очистка ===")
+    """Clean previous builds."""
+    print("\n=== Cleaning ===")
     for path in [DIST_DIR, BUILD_DIR, FRONTEND_DIR / "dist", BACKEND_DIR / "static"]:
         if path.exists():
-            print(f"Удаляю {path}")
+            print(f"Removing {path}")
             shutil.rmtree(path)
 
 
 def build_frontend():
-    """Сборка React frontend."""
-    print("\n=== Сборка Frontend ===")
+    """Build React frontend."""
+    print("\n=== Building Frontend ===")
 
-    # Установка зависимостей
+    # Install dependencies
     run_command(["npm", "install"], cwd=FRONTEND_DIR)
 
-    # Сборка production версии
+    # Build production version
     run_command(["npm", "run", "build"], cwd=FRONTEND_DIR)
 
-    # Копирование в backend/static
+    # Copy to backend/static
     src = FRONTEND_DIR / "dist"
     dst = BACKEND_DIR / "static"
-    print(f"Копирую {src} -> {dst}")
+    print(f"Copying {src} -> {dst}")
     shutil.copytree(src, dst)
 
 
 def build_backend():
-    """Сборка Python backend с PyInstaller."""
-    print("\n=== Сборка Backend ===")
+    """Build Python backend with PyInstaller."""
+    print("\n=== Building Backend ===")
 
-    # Проверяем PyInstaller
+    # Check PyInstaller
     try:
         import PyInstaller
     except ImportError:
-        print("PyInstaller не установлен. Устанавливаю...")
-        # Пробуем uv (если окружение создано через uv)
+        print("PyInstaller not installed. Installing...")
+        # Try uv (if environment was created with uv)
         try:
             run_command(["uv", "pip", "install", "pyinstaller"], cwd=BACKEND_DIR)
         except Exception:
-            # Fallback на обычный pip
+            # Fallback to regular pip
             run_command([sys.executable, "-m", "pip", "install", "pyinstaller"])
 
-    # Используем spec файл для сборки
+    # Use spec file for building
     spec_file = BACKEND_DIR / "MeshRadar.spec"
 
     run_command([
@@ -87,42 +87,42 @@ def build_backend():
 
 
 def copy_data_files():
-    """Копирование дополнительных файлов."""
-    print("\n=== Копирование дополнительных файлов ===")
+    """Copy additional files."""
+    print("\n=== Copying Additional Files ===")
 
-    # Копируем static в dist (рядом с exe)
+    # Copy static to dist (next to exe)
     static_src = BACKEND_DIR / "static"
     static_dst = DIST_DIR / "static"
     if static_src.exists():
-        print(f"Копирую {static_src} -> {static_dst}")
+        print(f"Copying {static_src} -> {static_dst}")
         shutil.copytree(static_src, static_dst)
 
 
 def create_readme():
-    """Создание README для портативной версии."""
+    """Create README for portable version."""
     readme = DIST_DIR / "README.txt"
     readme.write_text("""
-MeshRadar - Портативная версия
-==============================
+MeshRadar - Portable Version
+============================
 
-Запуск:
-1. Запустите MeshRadar.exe
-2. Браузер откроется автоматически на http://localhost:8000
-3. Подключите Meshtastic ноду по Serial или TCP
+Usage:
+1. Run MeshRadar.exe
+2. Browser will open automatically at http://localhost:8000
+3. Connect Meshtastic node via Serial or TCP
 
-Примечания:
-- База данных (SQLite) сохраняется в текущей папке
-- Закройте консоль для остановки сервера
-- Порт 8000 должен быть свободен
+Notes:
+- Database (SQLite) is saved in the current folder
+- Close the console to stop the server
+- Port 8000 must be available
 
-Поддержка: https://github.com/your-repo/meshtastic-web
+Support: https://github.com/your-repo/meshtastic-web
 """, encoding="utf-8")
-    print(f"Создан {readme}")
+    print(f"Created {readme}")
 
 
 def main():
     print("=" * 50)
-    print("Сборка портативной версии MeshRadar")
+    print("Building MeshRadar Portable Version")
     print("=" * 50)
 
     clean()
@@ -132,8 +132,8 @@ def main():
     create_readme()
 
     print("\n" + "=" * 50)
-    print("Сборка завершена!")
-    print(f"Результат: {DIST_DIR / 'MeshRadar.exe'}")
+    print("Build completed!")
+    print(f"Result: {DIST_DIR / 'MeshRadar.exe'}")
     print("=" * 50)
 
 

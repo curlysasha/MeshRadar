@@ -1,36 +1,36 @@
 @echo off
 echo ========================================
-echo Сборка портативной версии MeshRadar
+echo Building MeshRadar Portable Version
 echo ========================================
 
-REM Проверяем Node.js
+REM Check Node.js
 node --version >nul 2>&1
 if errorlevel 1 (
-    echo Ошибка: Node.js не найден!
-    echo Установите Node.js 18+ и добавьте в PATH
+    echo Error: Node.js not found!
+    echo Install Node.js 18+ and add it to PATH
     pause
     exit /b 1
 )
 
-REM Проверяем наличие venv
+REM Check venv
 if not exist "backend\.venv\Scripts\python.exe" (
-    echo Ошибка: Виртуальное окружение не найдено!
-    echo Создайте его: cd backend ^&^& python -m venv .venv ^&^& .venv\Scripts\pip install -r requirements.txt
+    echo Error: Virtual environment not found!
+    echo Create it: cd backend ^&^& python -m venv .venv ^&^& .venv\Scripts\pip install -r requirements.txt
     pause
     exit /b 1
 )
 
-REM Запускаем скрипт сборки через venv Python
-echo Используем Python из backend\.venv
+REM Run build script with venv Python
+echo Using Python from backend\.venv
 backend\.venv\Scripts\python.exe build_portable.py
 
 if errorlevel 1 (
     echo.
-    echo Сборка завершилась с ошибкой!
+    echo Build failed!
     pause
     exit /b 1
 )
 
 echo.
-echo Готово! Файл: dist\MeshtasticWeb.exe
+echo Done! File: dist\MeshtasticWeb.exe
 pause

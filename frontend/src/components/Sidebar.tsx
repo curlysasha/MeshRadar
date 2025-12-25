@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { ConnectionPanel } from './ConnectionPanel'
+import { ThemeToggle } from './ThemeToggle'
 import { useMeshStore } from '@/store'
 import { useNodes, useChannels } from '@/hooks/useApi'
 import { cn, getNodeName } from '@/lib/utils'
@@ -137,34 +138,37 @@ export function Sidebar() {
           MeshRadar
         </div>
 
-        {/* Language Switcher */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 rounded-lg hover:bg-secondary/60 transition-colors"
-            >
-              <Globe className="w-4 h-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-40">
-            <DropdownMenuItem
-              onClick={() => i18n.changeLanguage('en')}
-              className="cursor-pointer flex items-center justify-between"
-            >
-              <span>English</span>
-              {i18n.language.startsWith('en') && <Check className="w-4 h-4" />}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => i18n.changeLanguage('ru')}
-              className="cursor-pointer flex items-center justify-between"
-            >
-              <span>Русский</span>
-              {i18n.language.startsWith('ru') && <Check className="w-4 h-4" />}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {/* Theme Toggle and Language Switcher */}
+        <div className="flex items-center gap-1">
+          <ThemeToggle />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 rounded-lg hover:bg-secondary/60 transition-colors"
+              >
+                <Globe className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuItem
+                onClick={() => i18n.changeLanguage('en')}
+                className="cursor-pointer flex items-center justify-between"
+              >
+                <span>English</span>
+                {i18n.language.startsWith('en') && <Check className="w-4 h-4" />}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => i18n.changeLanguage('ru')}
+                className="cursor-pointer flex items-center justify-between"
+              >
+                <span>Русский</span>
+                {i18n.language.startsWith('ru') && <Check className="w-4 h-4" />}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       <ConnectionPanel />
