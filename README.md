@@ -174,6 +174,8 @@ curl -X POST http://localhost:8000/api/connect \
   -d '{"type": "ble", "address": "F4:12:FA:D0:45:AB"}'
 ```
 
+> **Note**: BLE scanning may not work with all firmware versions. Known working versions: up to v2.7.14. If you experience issues with BLE scanning on firmware v2.7.15 or newer, consider downgrading to v2.7.14.
+
 **Send Message:**
 
 ```bash
