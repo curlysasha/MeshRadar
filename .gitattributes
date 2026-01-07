@@ -1,0 +1,5 @@
+# Ensure shell scripts always use LF line endings on all platforms
+*.sh text eol=lf
+
+# Ensure other text files maintain consistent line endings
+* text=auto
