@@ -45,6 +45,7 @@ COPY --from=backend /usr/local/bin /usr/local/bin
 EXPOSE 80
 
 COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+# Convert line endings to LF (fixes Windows CRLF issues) and make executable
+RUN sed -i 's/\r$//' /entrypoint.sh && chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
