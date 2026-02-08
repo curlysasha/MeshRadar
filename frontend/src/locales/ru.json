@@ -23,7 +23,8 @@
         "unread": "Непрочитанные",
         "channels": "Каналы",
         "nodes": "Узлы",
-        "meshtastic": "MeshRadar"
+        "meshtastic": "MeshRadar",
+        "updateAvailable": "Доступно обновление"
     },
     "connection": {
         "connected": "Подключено",

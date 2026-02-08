@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { useMeshStore } from '@/store'
-import type { Node, Channel, Message } from '@/types'
+import type { Node, Channel, Message, UpdateInfo } from '@/types'
 
 const API_BASE = '/api'
 
@@ -145,6 +145,15 @@ export function useTraceroute() {
   return useMutation({
     mutationFn: (nodeId: string) =>
       fetchApi<{ success: boolean }>(`/traceroute/${nodeId}`, { method: 'POST' }),
+  })
+}
+
+export function useCheckUpdate() {
+  return useQuery({
+    queryKey: ['check-update'],
+    queryFn: () => fetchApi<UpdateInfo>('/check-update'),
+    staleTime: 60 * 60 * 1000,
+    retry: false,
   })
 }
 

@@ -23,7 +23,8 @@
         "unread": "Unread",
         "channels": "Channels",
         "nodes": "Nodes",
-        "meshtastic": "MeshRadar"
+        "meshtastic": "MeshRadar",
+        "updateAvailable": "Update available"
     },
     "connection": {
         "connected": "Connected",

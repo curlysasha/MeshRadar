@@ -3,9 +3,12 @@ import logging
 import json
 import sys
 import os
+import time
 import webbrowser
 from pathlib import Path
 from contextlib import asynccontextmanager
+from urllib.request import urlopen, Request
+from urllib.error import URLError
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -22,6 +25,11 @@ import database as db
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+APP_VERSION = "1.2"
+GITHUB_REPO = "curlysasha/MeshRadar"
+_update_cache: dict = {"result": None, "checked_at": 0}
+UPDATE_CACHE_TTL = 3600  # 1 hour
 
 # Определяем базовую директорию и путь к статике
 if getattr(sys, "frozen", False):
@@ -272,6 +280,73 @@ async def get_messages(channel: int = None, dm_partner: str = None, limit: int =
         channel=channel, dm_partner=dm_partner, my_node_id=my_node_id, limit=limit
     )
     return messages
+
+
+def _parse_version(v: str) -> tuple:
+    """Parse version string like 'v1.2' or '1.2.3' into comparable tuple."""
+    return tuple(int(x) for x in v.lstrip("v").split("."))
+
+
+def _fetch_latest_tag() -> dict:
+    """Fetch latest tag from GitHub API (blocking, run in thread)."""
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/tags?per_page=10"
+    req = Request(url, headers={"Accept": "application/vnd.github.v3+json", "User-Agent": "MeshRadar"})
+    with urlopen(req, timeout=10) as resp:
+        tags = json.loads(resp.read().decode())
+
+    if not tags:
+        return {"update_available": False, "current_version": APP_VERSION, "latest_version": APP_VERSION, "update_url": ""}
+
+    # Find highest version tag
+    best = None
+    best_parsed = (0,)
+    for tag in tags:
+        name = tag.get("name", "")
+        try:
+            parsed = _parse_version(name)
+            if parsed > best_parsed:
+                best_parsed = parsed
+                best = name
+        except (ValueError, IndexError):
+            continue
+
+    if best is None:
+        best = tags[0].get("name", APP_VERSION)
+
+    update_url = f"https://github.com/{GITHUB_REPO}/releases/tag/{best}"
+    try:
+        update_available = _parse_version(best) > _parse_version(APP_VERSION)
+    except (ValueError, IndexError):
+        update_available = False
+
+    return {
+        "current_version": APP_VERSION,
+        "latest_version": best,
+        "update_available": update_available,
+        "update_url": update_url,
+    }
+
+
+@app.get("/api/check-update")
+async def check_update():
+    now = time.time()
+    if _update_cache["result"] and (now - _update_cache["checked_at"]) < UPDATE_CACHE_TTL:
+        return _update_cache["result"]
+
+    try:
+        result = await asyncio.to_thread(_fetch_latest_tag)
+    except (URLError, OSError, json.JSONDecodeError) as e:
+        logger.warning(f"Update check failed: {e}")
+        result = {
+            "current_version": APP_VERSION,
+            "latest_version": APP_VERSION,
+            "update_available": False,
+            "update_url": "",
+        }
+
+    _update_cache["result"] = result
+    _update_cache["checked_at"] = now
+    return result
 
 
 # Монтируем статические файлы (React build)

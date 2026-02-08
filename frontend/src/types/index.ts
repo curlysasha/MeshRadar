@@ -78,3 +78,10 @@ export interface OpenTab {
   id: string // unique key: "channel:0" or "dm:!abc123"
   target: ChatTarget
 }
+
+export interface UpdateInfo {
+  current_version: string
+  latest_version: string
+  update_available: boolean
+  update_url: string
+}
