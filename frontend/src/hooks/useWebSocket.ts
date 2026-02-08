@@ -57,7 +57,9 @@ export function useWebSocket() {
               text: string
               timestamp?: number
               snr?: number
+              rssi?: number
               hop_limit?: number
+              hop_start?: number
               reply_id?: number
             }
 
@@ -74,6 +76,10 @@ export function useWebSocket() {
               ack_status: 'received',
               is_outgoing: false,
               reply_id: data.reply_id,
+              snr: data.snr,
+              rssi: data.rssi,
+              hop_limit: data.hop_limit,
+              hop_start: data.hop_start,
             })
 
             const currentChat = store.currentChat

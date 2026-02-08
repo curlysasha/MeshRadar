@@ -374,7 +374,7 @@ class MeshtasticManager:
         if reply_id is None:
             reply_id = packet.get("replyId") or packet.get("reply_id") or packet.get("replyTo")
 
-        logger.info(f"Received message: id={packet_id}, sender={sender}, text={text[:20]}..., reply_id={reply_id}")
+        logger.info(f"Received message: id={packet_id}, sender={sender}, text={text[:20]}..., reply_id={reply_id}, snr={packet.get('rxSnr')}, rssi={packet.get('rxRssi')}, hopLimit={packet.get('hopLimit')}, hopStart={packet.get('hopStart')}")
 
         self._run_async(db.save_message(
             packet_id=packet_id,
@@ -384,8 +384,17 @@ class MeshtasticManager:
             text=text,
             is_outgoing=False,
             ack_status="received",
-            reply_id=reply_id
+            reply_id=reply_id,
+            snr=packet.get("rxSnr"),
+            rssi=packet.get("rxRssi"),
+            hop_limit=packet.get("hopLimit"),
+            hop_start=packet.get("hopStart"),
         ))
+
+        rx_snr = packet.get("rxSnr")
+        rx_rssi = packet.get("rxRssi")
+        hop_limit = packet.get("hopLimit")
+        hop_start = packet.get("hopStart")
 
         ws_manager.broadcast_sync({
             "type": "message",
@@ -396,8 +405,10 @@ class MeshtasticManager:
                 "channel": channel,
                 "text": text,
                 "timestamp": packet.get("rxTime"),
-                "snr": packet.get("rxSnr"),
-                "hop_limit": packet.get("hopLimit"),
+                "snr": rx_snr,
+                "rssi": rx_rssi,
+                "hop_limit": hop_limit,
+                "hop_start": hop_start,
                 "reply_id": reply_id
             }
         })
@@ -565,9 +576,11 @@ class MeshtasticManager:
 
     def send_message(self, text: str, destination_id: Optional[str] = None, channel_index: int = 0, reply_id: Optional[int] = None) -> Optional[int]:
         if not self.interface:
+            logger.warning("Cannot send message - not connected")
             return None
 
         try:
+            logger.info(f"Sending message via {self.connection_type}: {text[:50]}...")
             result = self.interface.sendText(
                 text=text,
                 destinationId=destination_id or "^all",
@@ -576,6 +589,7 @@ class MeshtasticManager:
                 replyId=reply_id
             )
             packet_id = result.id if result else None
+            logger.info(f"Message sent successfully, packet_id={packet_id}")
 
             self._run_async(db.save_message(
                 packet_id=packet_id,

@@ -42,6 +42,10 @@ export interface Message {
   is_outgoing?: boolean
   reactions?: Record<string, string[]> // emoji -> [senderIds]
   reply_id?: number
+  snr?: number
+  rssi?: number
+  hop_limit?: number
+  hop_start?: number
 }
 
 export interface ConnectionStatus {

@@ -1,4 +1,4 @@
-import { Check, CheckCheck, X, Clock, CornerUpLeft } from 'lucide-react'
+import { Check, CheckCheck, X, Clock, CornerUpLeft, Signal, Radio, ArrowRightLeft } from 'lucide-react'
 import type { Message } from '@/types'
 import { cn, formatTime } from '@/lib/utils'
 import { useMeshStore } from '@/store'
@@ -31,6 +31,12 @@ export function MessageBubble({ message, onReply, isGroupStart = true, isGroupEn
     if (id === status.my_node_id) return 'You'
     return node?.user?.longName || node?.user?.shortName || id
   }
+
+  // Radio metadata
+  const hops = typeof message.hop_start === 'number' && typeof message.hop_limit === 'number'
+    ? message.hop_start - message.hop_limit
+    : null
+  const hasRadioMeta = !isOutgoing && (typeof message.snr === 'number' || typeof message.rssi === 'number' || hops !== null)
 
   const AckIcon = () => {
     switch (message.ack_status) {
@@ -149,8 +155,30 @@ export function MessageBubble({ message, onReply, isGroupStart = true, isGroupEn
                 </div>
               )}
 
-              {/* Internal Timestamp & Ack - Bottom Right */}
+              {/* Internal Timestamp, Radio Metadata & Ack - Bottom Right */}
               <div className="flex items-center gap-1 ml-auto shrink-0 pb-0.5">
+                {hasRadioMeta && (
+                  <div className="flex items-center gap-1.5 mr-1 opacity-40">
+                    {hops !== null && (
+                      <span className="flex items-center gap-0.5 text-[9px] font-medium" title={`${hops} hop${hops !== 1 ? 's' : ''}`}>
+                        <ArrowRightLeft className="w-2.5 h-2.5" />
+                        {hops}
+                      </span>
+                    )}
+                    {typeof message.snr === 'number' && (
+                      <span className="flex items-center gap-0.5 text-[9px] font-medium" title={`SNR: ${message.snr.toFixed(1)} dB`}>
+                        <Signal className="w-2.5 h-2.5" />
+                        {message.snr.toFixed(1)}
+                      </span>
+                    )}
+                    {typeof message.rssi === 'number' && (
+                      <span className="flex items-center gap-0.5 text-[9px] font-medium" title={`RSSI: ${message.rssi} dBm`}>
+                        <Radio className="w-2.5 h-2.5" />
+                        {message.rssi}
+                      </span>
+                    )}
+                  </div>
+                )}
                 <span className={cn(
                   "text-[9px] font-medium leading-none",
                   isOutgoing ? "opacity-70" : "opacity-50"

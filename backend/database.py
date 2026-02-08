@@ -43,11 +43,18 @@ async def init_db():
         )
     """
     )
-    # Add reply_id column if it doesn't exist (migration)
-    try:
-        await db.execute("ALTER TABLE messages ADD COLUMN reply_id INTEGER")
-    except:
-        pass
+    # Migrations: add columns if they don't exist
+    for col in [
+        "reply_id INTEGER",
+        "snr REAL",
+        "rssi REAL",
+        "hop_limit INTEGER",
+        "hop_start INTEGER",
+    ]:
+        try:
+            await db.execute(f"ALTER TABLE messages ADD COLUMN {col}")
+        except:
+            pass
 
     await db.execute(
         """
@@ -89,11 +96,15 @@ async def save_message(
     is_outgoing: bool = False,
     ack_status: str = "pending",
     reply_id: Optional[int] = None,
+    snr: Optional[float] = None,
+    rssi: Optional[float] = None,
+    hop_limit: Optional[int] = None,
+    hop_start: Optional[int] = None,
 ) -> int:
     db = await get_db()
     cursor = await db.execute(
-        """INSERT INTO messages (packet_id, sender, receiver, channel, text, is_outgoing, ack_status, reply_id)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+        """INSERT INTO messages (packet_id, sender, receiver, channel, text, is_outgoing, ack_status, reply_id, snr, rssi, hop_limit, hop_start)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (
             packet_id,
             sender,
@@ -103,6 +114,10 @@ async def save_message(
             int(is_outgoing),
             ack_status,
             reply_id,
+            snr,
+            rssi,
+            hop_limit,
+            hop_start,
         ),
     )
     await db.commit()
