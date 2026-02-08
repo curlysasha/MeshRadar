@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Hash, User, Battery, Signal, ArrowUpDown, Search, X, Globe, Check, Star } from 'lucide-react'
+import { Hash, User, Battery, Signal, ArrowUpDown, Search, X, Globe, Check, Star, Github } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Button } from '@/components/ui/button'
@@ -130,12 +130,23 @@ export function Sidebar() {
     <div className="bg-card border-r border-border flex flex-col h-full w-full">
       {/* Header */}
       <div className="h-14 px-4 border-b border-border flex items-center justify-between shrink-0">
-        <div
-          className="font-semibold text-lg flex items-center gap-2 hover:text-primary cursor-pointer transition-colors"
-          onClick={() => setIsNetworkMapOpen(true)}
-        >
-          <Hash className="w-5 h-5" />
-          MeshRadar
+        <div className="flex items-center gap-2">
+          <div
+            className="font-semibold text-lg flex items-center gap-2 hover:text-primary cursor-pointer transition-colors"
+            onClick={() => setIsNetworkMapOpen(true)}
+          >
+            <Hash className="w-5 h-5" />
+            MeshRadar
+          </div>
+          <a
+            href="https://github.com/curlysasha/MeshRadar"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group/gh inline-flex items-center justify-center h-7 w-7 rounded-full hover:bg-foreground/10 transition-all duration-200 text-muted-foreground/60 hover:text-foreground hover:scale-110 mt-0.5"
+            title="GitHub"
+          >
+            <Github className="w-5 h-5 transition-transform duration-200 group-hover/gh:rotate-[360deg]" />
+          </a>
         </div>
 
         {/* Theme Toggle and Language Switcher */}
