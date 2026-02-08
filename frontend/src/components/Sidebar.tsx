@@ -127,7 +127,7 @@ export function Sidebar() {
   )
 
   return (
-    <div className="w-[360px] bg-card border-r border-border flex flex-col h-full">
+    <div className="bg-card border-r border-border flex flex-col h-full w-full">
       {/* Header */}
       <div className="h-14 px-4 border-b border-border flex items-center justify-between shrink-0">
         <div

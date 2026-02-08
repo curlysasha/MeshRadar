@@ -836,7 +836,7 @@ export function NodeInfoPanel() {
 
   if (isNetworkMapOpen) {
     return (
-      <div className="w-[360px] flex-shrink-0 border-l border-border bg-card flex flex-col h-full shadow-2xl z-20 overflow-hidden">
+      <div className="w-full border-l border-border bg-card flex flex-col h-full shadow-2xl z-20 overflow-hidden">
         {header}
         <ScrollArea className="flex-1 p-4">
           {/* Mini Map with Expand Button */}
@@ -979,7 +979,7 @@ export function NodeInfoPanel() {
   if (!selectedNode) return null
 
   return (
-    <div className="w-[360px] bg-card border-l border-border flex flex-col h-full">
+    <div className="w-full bg-card border-l border-border flex flex-col h-full">
       <div className="h-14 px-4 border-b border-border flex items-center justify-between">
         <h2 className="font-semibold">{t('nodeInfo.title')}</h2>
         <div className="flex items-center gap-1">
