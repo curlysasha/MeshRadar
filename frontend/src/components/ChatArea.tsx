@@ -9,7 +9,7 @@ import { ChatTabs } from './ChatTabs'
 import { DateDivider } from './DateDivider'
 import { useMeshStore } from '@/store'
 import { useSendMessage, useMessages } from '@/hooks/useApi'
-import { cn } from '@/lib/utils'
+import { cn, parseTimestamp } from '@/lib/utils'
 import { isSameDay } from 'date-fns'
 import type { Message } from '@/types'
 
@@ -110,7 +110,7 @@ export function ChatArea() {
 
     // Sort by timestamp to ensure correct order
     const sorted = [...filteredMessages].sort((a, b) =>
-      new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+      parseTimestamp(a.timestamp).getTime() - parseTimestamp(b.timestamp).getTime()
     )
 
     // First pass: extract reactions and build the base message list
@@ -145,15 +145,15 @@ export function ChatArea() {
       const nextMsg = idx < result.length - 1 ? result[idx + 1] : null
 
       // Date Divider logic
-      msg.showDateDivider = !prevMsg || !isSameDay(new Date(msg.timestamp), new Date(prevMsg.timestamp))
+      msg.showDateDivider = !prevMsg || !isSameDay(parseTimestamp(msg.timestamp), parseTimestamp(prevMsg.timestamp))
 
       // Grouping logic (same sender, within 5 minutes)
       const isSameSenderAsPrev = prevMsg && prevMsg.sender === msg.sender
-      const timeDiffPrev = prevMsg ? Math.abs(new Date(msg.timestamp).getTime() - new Date(prevMsg.timestamp).getTime()) : Infinity
+      const timeDiffPrev = prevMsg ? Math.abs(parseTimestamp(msg.timestamp).getTime() - parseTimestamp(prevMsg.timestamp).getTime()) : Infinity
       msg.isGroupStart = msg.showDateDivider || !isSameSenderAsPrev || timeDiffPrev > 5 * 60 * 1000
 
       const isSameSenderAsNext = nextMsg && nextMsg.sender === msg.sender
-      const timeDiffNext = nextMsg ? Math.abs(new Date(nextMsg.timestamp).getTime() - new Date(msg.timestamp).getTime()) : Infinity
+      const timeDiffNext = nextMsg ? Math.abs(parseTimestamp(nextMsg.timestamp).getTime() - parseTimestamp(msg.timestamp).getTime()) : Infinity
       msg.isGroupEnd = !isSameSenderAsNext || timeDiffNext > 5 * 60 * 1000
     })
 

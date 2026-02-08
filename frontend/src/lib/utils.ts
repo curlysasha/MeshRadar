@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-function parseTimestamp(timestamp: string | number): Date {
+export function parseTimestamp(timestamp: string | number): Date {
   if (typeof timestamp === 'number') {
     return new Date(timestamp * 1000)
   }

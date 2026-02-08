@@ -1,11 +1,12 @@
 import { format } from 'date-fns'
+import { parseTimestamp } from '@/lib/utils'
 
 interface Props {
-    date: string | Date
+    date: string | number | Date
 }
 
 export function DateDivider({ date }: Props) {
-    const dateObj = typeof date === 'string' ? new Date(date) : date
+    const dateObj = date instanceof Date ? date : parseTimestamp(date)
 
     // Logical helpers
     const isToday = (d: Date) => d.toDateString() === new Date().toDateString()
