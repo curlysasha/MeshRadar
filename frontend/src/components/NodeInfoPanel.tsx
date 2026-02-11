@@ -1069,7 +1069,7 @@ export function NodeInfoPanel() {
         )}
 
         {/* Position */}
-        {selectedNode.position && (
+        {selectedNode.position && Number.isFinite(selectedNode.position.latitude) && Number.isFinite(selectedNode.position.longitude) && (
           <div className="mb-4 p-3 bg-secondary/50 rounded-lg">
             <div className="text-xs text-muted-foreground uppercase mb-2 flex items-center gap-1">
               <MapPin className="w-3 h-3" />
